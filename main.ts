@@ -41,8 +41,8 @@ declare namespace Deno {
   }
   
   /**
-   * 请求统计信息接口
-   * 用于跟踪API调用的各项指?
+   * ����ͳ����Ϣ�ӿ�
+   * ���ڸ���API���õĸ���ָ?
    */
   interface RequestStats {
     totalRequests: number;
@@ -53,8 +53,8 @@ declare namespace Deno {
   }
   
   /**
-   * 实时请求信息接口
-   * 用于Dashboard显示最近的API请求记录
+   * ʵʱ������Ϣ�ӿ�
+   * ����Dashboard��ʾ�����API�����¼
    */
   interface LiveRequest {
     id: string;
@@ -68,8 +68,8 @@ declare namespace Deno {
   }
   
   /**
-   * OpenAI兼容请求结构
-   * 标准的聊天完成API请求格式
+   * OpenAI��������ṹ
+   * ��׼���������API�����ʽ
    */
   interface OpenAIRequest {
     model: string;
@@ -80,8 +80,8 @@ declare namespace Deno {
   }
   
   /**
-   * 聊天消息结构
-   * 支持全方位多模态内容：文本、图像、视频、文?
+   * ������Ϣ�ṹ
+   * ֧��ȫ��λ��ģ̬���ݣ��ı���ͼ����Ƶ����?
    */
   interface Message {
     role: string;
@@ -96,8 +96,8 @@ declare namespace Deno {
   }
   
   /**
-   * 上游服务请求结构
-   * 向Z.ai服务发送的请求格式
+   * ���η�������ṹ
+   * ��Z.ai�����͵������ʽ
    */
   interface UpstreamRequest {
     stream: boolean;
@@ -124,7 +124,7 @@ declare namespace Deno {
   }
   
   /**
-   * OpenAI兼容响应结构
+   * OpenAI������Ӧ�ṹ
    */
   interface OpenAIResponse {
     id: string;
@@ -154,7 +154,7 @@ declare namespace Deno {
   }
   
   /**
-   * 上游SSE数据结构
+   * ����SSE���ݽṹ
    */
   interface UpstreamData {
     type: string;
@@ -189,13 +189,13 @@ declare namespace Deno {
   }
   
   /**
-   * 配置常量定义
+   * ���ó�������
    */
   
-  // 思考内容处理策? strip-去除<details>标签, think-转为<thinking>标签, raw-保留原样
+  // ˼�����ݴ����? strip-ȥ��<details>��ǩ, think-תΪ<thinking>��ǩ, raw-����ԭ��
   const THINK_TAGS_MODE = "strip";
   
-  // 伪装前端头部（来自抓包分析）
+  // αװǰ��ͷ��������ץ��������
   const X_FE_VERSION = "prod-fe-1.0.70";
   const BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0";
   const SEC_CH_UA = "\"Not;A=Brand\";v=\"99\", \"Microsoft Edge\";v=\"139\", \"Chromium\";v=\"139\"";
@@ -206,19 +206,19 @@ declare namespace Deno {
   const ANON_TOKEN_ENABLED = true;
   
   /**
-   * 环境变量配置
+   * ������������
    */
   const UPSTREAM_URL = Deno.env.get("UPSTREAM_URL") || "https://chat.z.ai/api/chat/completions";
   const DEFAULT_KEY = Deno.env.get("DEFAULT_KEY") || "sk-your-key";
   const ZAI_TOKEN = Deno.env.get("ZAI_TOKEN") || "";
   
   /**
-   * 支持的模型配?
+   * ֧�ֵ�ģ����?
    */
   interface ModelConfig {
-    id: string;           // OpenAI API中的模型ID
-    name: string;         // 显示名称
-    upstreamId: string;   // Z.ai上游的模型ID
+    id: string;           // OpenAI API�е�ģ��ID
+    name: string;         // ��ʾ����
+    upstreamId: string;   // Z.ai���ε�ģ��ID
     capabilities: {
       vision: boolean;
       mcp: boolean;
@@ -263,17 +263,17 @@ declare namespace Deno {
     }
   ];
   
-  // 默认模型
+  // Ĭ��ģ��
   const DEFAULT_MODEL = SUPPORTED_MODELS[0];
   
-  // 根据模型ID获取配置
+  // ����ģ��ID��ȡ����
   function getModelConfig(modelId: string): ModelConfig {
-    // 标准化模型ID，处理Cherry Studio等客户端的大小写差异
+    // ��׼��ģ��ID������Cherry Studio�ȿͻ��˵Ĵ�Сд����
     const normalizedModelId = normalizeModelId(modelId);
     const found = SUPPORTED_MODELS.find(m => m.id === normalizedModelId);
     
     if (!found) {
-      debugLog("⚠️ 未找到模型配? %s (标准化后: %s)，使用默认模? %s", 
+      debugLog("?? δ�ҵ�ģ����? %s (��׼����: %s)��ʹ��Ĭ��ģ? %s", 
         modelId, normalizedModelId, DEFAULT_MODEL.name);
     }
     
@@ -281,28 +281,28 @@ declare namespace Deno {
   }
   
   /**
-   * 标准化模型ID，处理不同客户端的命名差?
-   * Cherry Studio等客户端可能使用不同的大小写格式
+   * ��׼��ģ��ID�������ͬ�ͻ��˵�������?
+   * Cherry Studio�ȿͻ��˿���ʹ�ò�ͬ�Ĵ�Сд��ʽ
    */
   function normalizeModelId(modelId: string): string {
     const normalized = modelId.toLowerCase().trim();
     
-    // 处理常见的模型ID映射
+    // ���������ģ��IDӳ��
     const modelMappings: Record<string, string> = {
       'glm-4.5v': 'glm-4.5v',
       'glm4.5v': 'glm-4.5v',
       'glm_4.5v': 'glm-4.5v',
-      'gpt-4-vision-preview': 'glm-4.5v',  // 向后兼容
+      'gpt-4-vision-preview': 'glm-4.5v',  // ������
       '0727-360b-api': '0727-360B-API',
       'glm-4.5': '0727-360B-API',
       'glm4.5': '0727-360B-API',
       'glm_4.5': '0727-360B-API',
-      'gpt-4': '0727-360B-API'  // 向后兼容
+      'gpt-4': '0727-360B-API'  // ������
     };
     
     const mapped = modelMappings[normalized];
     if (mapped) {
-      debugLog("🔄 模型ID映射: %s ?%s", modelId, mapped);
+      debugLog("?? ģ��IDӳ��: %s ?%s", modelId, mapped);
       return mapped;
     }
     
@@ -310,8 +310,8 @@ declare namespace Deno {
   }
   
   /**
-   * 处理和验证全方位多模态消?
-   * 支持图像、视频、文档、音频等多种媒体类型
+   * �������֤ȫ��λ��ģ̬��?
+   * ֧��ͼ����Ƶ���ĵ�����Ƶ�ȶ���ý������
    */
   function processMessages(messages: Message[], modelConfig: ModelConfig): Message[] {
     const processedMessages: Message[] = [];
@@ -319,11 +319,11 @@ declare namespace Deno {
     for (const message of messages) {
       const processedMessage: Message = { ...message };
       
-      // 检查是否为多模态消?
+      // ����Ƿ�Ϊ��ģ̬��?
       if (Array.isArray(message.content)) {
-        debugLog("检测到多模态消息，内容块数? %d", message.content.length);
+        debugLog("��⵽��ģ̬��Ϣ�����ݿ���? %d", message.content.length);
         
-        // 统计各种媒体类型
+        // ͳ�Ƹ���ý������
         const mediaStats = {
           text: 0,
           images: 0,
@@ -333,23 +333,23 @@ declare namespace Deno {
           others: 0
         };
         
-        // 验证模型是否支持多模态
+        // ��֤ģ���Ƿ�֧�ֶ�ģ̬
         if (!modelConfig.capabilities.vision) {
-          debugLog("警告: 模型 %s 不支持多模态，但收到了多模态消息", modelConfig.name);
-          // 只保留文本内容
+          debugLog("����: ģ�� %s ��֧�ֶ�ģ̬�����յ��˶�ģ̬��Ϣ", modelConfig.name);
+          // ֻ�����ı�����
           const textContent = message.content
             .filter(block => block.type === 'text')
             .map(block => block.text)
             .join('\n');
           processedMessage.content = textContent;
         } else {
-          // GLM-4.5V 支持全方位多模态，处理所有内容类?
+          // GLM-4.5V ֧��ȫ��λ��ģ̬����������������?
           for (const block of message.content) {
             switch (block.type) {
               case 'text':
                 if (block.text) {
                   mediaStats.text++;
-                  debugLog("📝 文本内容，长? %d", block.text.length);
+                  debugLog("?? �ı����ݣ���? %d", block.text.length);
                 }
                 break;
                 
@@ -360,11 +360,11 @@ declare namespace Deno {
                   if (url.startsWith('data:image/')) {
                     const mimeMatch = url.match(/data:image\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog("🖼?图像数据: %s格式, 大小: %d字符", format, url.length);
+                    debugLog("???ͼ������: %s��ʽ, ��С: %d�ַ�", format, url.length);
                   } else if (url.startsWith('http')) {
-                    debugLog("🔗 图像URL: %s", url);
+                    debugLog("?? ͼ��URL: %s", url);
                   } else {
-                    debugLog("⚠️ 未知图像格式: %s", url.substring(0, 50));
+                    debugLog("?? δ֪ͼ���ʽ: %s", url.substring(0, 50));
                   }
                 }
                 break;
@@ -376,11 +376,11 @@ declare namespace Deno {
                   if (url.startsWith('data:video/')) {
                     const mimeMatch = url.match(/data:video\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog("🎥 视频数据: %s格式, 大小: %d字符", format, url.length);
+                    debugLog("?? ��Ƶ����: %s��ʽ, ��С: %d�ַ�", format, url.length);
                   } else if (url.startsWith('http')) {
-                    debugLog("🔗 视频URL: %s", url);
+                    debugLog("?? ��ƵURL: %s", url);
                   } else {
-                    debugLog("⚠️ 未知视频格式: %s", url.substring(0, 50));
+                    debugLog("?? δ֪��Ƶ��ʽ: %s", url.substring(0, 50));
                   }
                 }
                 break;
@@ -392,11 +392,11 @@ declare namespace Deno {
                   if (url.startsWith('data:application/')) {
                     const mimeMatch = url.match(/data:application\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog("📄 文档数据: %s格式, 大小: %d字符", format, url.length);
+                    debugLog("?? �ĵ�����: %s��ʽ, ��С: %d�ַ�", format, url.length);
                   } else if (url.startsWith('http')) {
-                    debugLog("🔗 文档URL: %s", url);
+                    debugLog("?? �ĵ�URL: %s", url);
                   } else {
-                    debugLog("⚠️ 未知文档格式: %s", url.substring(0, 50));
+                    debugLog("?? δ֪�ĵ���ʽ: %s", url.substring(0, 50));
                   }
                 }
                 break;
@@ -408,30 +408,30 @@ declare namespace Deno {
                   if (url.startsWith('data:audio/')) {
                     const mimeMatch = url.match(/data:audio\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog("🎵 音频数据: %s格式, 大小: %d字符", format, url.length);
+                    debugLog("?? ��Ƶ����: %s��ʽ, ��С: %d�ַ�", format, url.length);
                   } else if (url.startsWith('http')) {
-                    debugLog("🔗 音频URL: %s", url);
+                    debugLog("?? ��ƵURL: %s", url);
                   } else {
-                    debugLog("⚠️ 未知音频格式: %s", url.substring(0, 50));
+                    debugLog("?? δ֪��Ƶ��ʽ: %s", url.substring(0, 50));
                   }
                 }
                 break;
                 
               default:
                 mediaStats.others++;
-                debugLog("?未知内容类型: %s", block.type);
+                debugLog("?δ֪��������: %s", block.type);
             }
           }
           
-          // 输出统计信息
+          // ���ͳ����Ϣ
           const totalMedia = mediaStats.images + mediaStats.videos + mediaStats.documents + mediaStats.audios;
           if (totalMedia > 0) {
-            debugLog("🎯 多模态内容统? 文本(%d) 图像(%d) 视频(%d) 文档(%d) 音频(%d)", 
+            debugLog("?? ��ģ̬����ͳ? �ı�(%d) ͼ��(%d) ��Ƶ(%d) �ĵ�(%d) ��Ƶ(%d)", 
               mediaStats.text, mediaStats.images, mediaStats.videos, mediaStats.documents, mediaStats.audios);
           }
         }
       } else if (typeof message.content === 'string') {
-        debugLog("📝 纯文本消息，长度: %d", message.content.length);
+        debugLog("?? ���ı���Ϣ������: %d", message.content.length);
       }
       
       processedMessages.push(processedMessage);
@@ -440,12 +440,12 @@ declare namespace Deno {
     return processedMessages;
   }
   
-  const DEBUG_MODE = Deno.env.get("DEBUG_MODE") !== "false"; // 默认为true
-  const DEFAULT_STREAM = Deno.env.get("DEFAULT_STREAM") !== "false"; // 默认为true
-  const DASHBOARD_ENABLED = Deno.env.get("DASHBOARD_ENABLED") !== "false"; // 默认为true
+  const DEBUG_MODE = Deno.env.get("DEBUG_MODE") !== "false"; // Ĭ��Ϊtrue
+  const DEFAULT_STREAM = Deno.env.get("DEFAULT_STREAM") !== "false"; // Ĭ��Ϊtrue
+  const DASHBOARD_ENABLED = Deno.env.get("DASHBOARD_ENABLED") !== "false"; // Ĭ��Ϊtrue
   
   /**
-   * 全局状态变?
+   * ȫ��״̬��?
    */
   
   let stats: RequestStats = {
@@ -459,7 +459,7 @@ declare namespace Deno {
   let liveRequests: LiveRequest[] = [];
   
   /**
-   * 工具函数
+   * ���ߺ���
    */
   
   function debugLog(format: string, ...args: unknown[]): void {
@@ -480,7 +480,7 @@ declare namespace Deno {
       stats.failedRequests++;
     }
     
-    // 更新平均响应时间
+    // ����ƽ����Ӧʱ��
     if (stats.totalRequests > 0) {
       const totalDuration = stats.averageResponseTime * (stats.totalRequests - 1) + duration;
       stats.averageResponseTime = totalDuration / stats.totalRequests;
@@ -503,7 +503,7 @@ declare namespace Deno {
     
     liveRequests.push(request);
     
-    // 只保留最近的100条请?
+    // ֻ���������100����?
     if (liveRequests.length > 100) {
       liveRequests = liveRequests.slice(1);
     }
@@ -511,13 +511,13 @@ declare namespace Deno {
   
   function getLiveRequestsData(): string {
     try {
-      // 确保liveRequests是数组
+      // ȷ��liveRequests������
       if (!Array.isArray(liveRequests)) {
-        debugLog("liveRequests不是数组，重置为空数组");
+        debugLog("liveRequests�������飬����Ϊ������");
         liveRequests = [];
       }
       
-      // 确保返回的数据格式与前端期望的一致
+      // ȷ�����ص����ݸ�ʽ��ǰ��������һ��
       const requestData = liveRequests.map(req => ({
         id: req.id || "",
         timestamp: req.timestamp || new Date(),
@@ -530,16 +530,16 @@ declare namespace Deno {
       
       return JSON.stringify(requestData);
     } catch (error) {
-      debugLog("获取实时请求数据失败: %v", error);
+      debugLog("��ȡʵʱ��������ʧ��: %v", error);
       return JSON.stringify([]);
     }
   }
   
   function getStatsData(): string {
     try {
-      // 确保stats对象存在
+      // ȷ��stats�������
       if (!stats) {
-        debugLog("stats对象不存在，使用默认值");
+        debugLog("stats���󲻴��ڣ�ʹ��Ĭ��ֵ");
         stats = {
           totalRequests: 0,
           successfulRequests: 0,
@@ -549,7 +549,7 @@ declare namespace Deno {
         };
       }
       
-      // 确保返回的数据格式与前端期望的一?
+      // ȷ�����ص����ݸ�ʽ��ǰ��������һ?
       const statsData = {
         totalRequests: stats.totalRequests || 0,
         successfulRequests: stats.successfulRequests || 0,
@@ -559,7 +559,7 @@ declare namespace Deno {
       
       return JSON.stringify(statsData);
     } catch (error) {
-      debugLog("获取统计数据失败: %v", error);
+      debugLog("��ȡͳ������ʧ��: %v", error);
       return JSON.stringify({
         totalRequests: 0,
         successfulRequests: 0,
@@ -570,7 +570,7 @@ declare namespace Deno {
   }
   
   function getClientIP(request: Request): string {
-    // 检查X-Forwarded-For?
+    // ���X-Forwarded-For?
     const xff = request.headers.get("X-Forwarded-For");
     if (xff) {
       const ips = xff.split(",");
@@ -579,13 +579,13 @@ declare namespace Deno {
       }
     }
     
-    // 检查X-Real-IP?
+    // ���X-Real-IP?
     const xri = request.headers.get("X-Real-IP");
     if (xri) {
       return xri;
     }
     
-    // 对于Deno Deploy，我们无法直接获取RemoteAddr，返回一个默?
+    // ����Deno Deploy�������޷�ֱ�ӻ�ȡRemoteAddr������һ��Ĭ?
     return "unknown";
   }
   
@@ -633,21 +633,21 @@ declare namespace Deno {
       
       return data.token;
     } catch (error) {
-      debugLog("获取匿名token失败: %v", error);
+      debugLog("��ȡ����tokenʧ��: %v", error);
       throw error;
     }
   }
   
-  // 调用上游API
+  // ��������API
   async function callUpstreamWithHeaders(
     upstreamReq: UpstreamRequest, 
     refererChatID: string, 
     authToken: string
   ): Promise<Response> {
     try {
-      debugLog("调用上游API: %s", UPSTREAM_URL);
+      debugLog("��������API: %s", UPSTREAM_URL);
       
-      // 特别检查和记录全方位多模态内?
+      // �ر���ͼ�¼ȫ��λ��ģ̬��?
       const hasMultimedia = upstreamReq.messages.some(msg => 
         Array.isArray(msg.content) && 
         msg.content.some(block => 
@@ -656,7 +656,7 @@ declare namespace Deno {
       );
       
       if (hasMultimedia) {
-        debugLog("🎯 请求包含多模态数据，正在发送到上游...");
+        debugLog("?? ���������ģ̬���ݣ����ڷ��͵�����...");
         
         for (let i = 0; i < upstreamReq.messages.length; i++) {
           const msg = upstreamReq.messages[i];
@@ -664,64 +664,64 @@ declare namespace Deno {
             for (let j = 0; j < msg.content.length; j++) {
               const block = msg.content[j];
               
-              // 处理图像
+              // ����ͼ��
               if (block.type === 'image_url' && block.image_url?.url) {
                 const url = block.image_url.url;
                 if (url.startsWith('data:image/')) {
                   const mimeMatch = url.match(/data:image\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  const sizeKB = Math.round(url.length * 0.75 / 1024); // base64 大约是原文件?1.33 ?
-                  debugLog("🖼️消息[%d] 图像[%d]: %s格式, 数据长度: %d字符 (~%dKB)", 
+                  const sizeKB = Math.round(url.length * 0.75 / 1024); // base64 ��Լ��ԭ�ļ�?1.33 ?
+                  debugLog("???��Ϣ[%d] ͼ��[%d]: %s��ʽ, ���ݳ���: %d�ַ� (~%dKB)", 
                     i, j, format, url.length, sizeKB);
                   
-                  // 图片大小警告
+                  // ͼƬ��С����
                   if (sizeKB > 1000) {
-                    debugLog("⚠️  图片较大 (%dKB)，可能导致上游处理失败", sizeKB);
-                    debugLog("💡 建议: 将图片压缩到 500KB 以下");
+                    debugLog("??  ͼƬ�ϴ� (%dKB)�����ܵ������δ���ʧ��", sizeKB);
+                    debugLog("?? ����: ��ͼƬѹ���� 500KB ����");
                   } else if (sizeKB > 500) {
-                    debugLog("⚠️  图片偏大 (%dKB)，建议压缩", sizeKB);
+                    debugLog("??  ͼƬƫ�� (%dKB)������ѹ��", sizeKB);
                   }
                 } else {
-                  debugLog("🔗 消息[%d] 图像[%d]: 外部URL - %s", i, j, url);
+                  debugLog("?? ��Ϣ[%d] ͼ��[%d]: �ⲿURL - %s", i, j, url);
                 }
               }
               
-              // 处理视频
+              // ������Ƶ
               if (block.type === 'video_url' && block.video_url?.url) {
                 const url = block.video_url.url;
                 if (url.startsWith('data:video/')) {
                   const mimeMatch = url.match(/data:video\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog("🎥 消息[%d] 视频[%d]: %s格式, 数据长度: %d字符", 
+                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
                     i, j, format, url.length);
                 } else {
-                  debugLog("🔗 消息[%d] 视频[%d]: 外部URL - %s", i, j, url);
+                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: �ⲿURL - %s", i, j, url);
                 }
               }
               
-              // 处理文档
+              // �����ĵ�
               if (block.type === 'document_url' && block.document_url?.url) {
                 const url = block.document_url.url;
                 if (url.startsWith('data:application/')) {
                   const mimeMatch = url.match(/data:application\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog("📄 消息[%d] 文档[%d]: %s格式, 数据长度: %d字符", 
+                  debugLog("?? ��Ϣ[%d] �ĵ�[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
                     i, j, format, url.length);
                 } else {
-                  debugLog("🔗 消息[%d] 文档[%d]: 外部URL - %s", i, j, url);
+                  debugLog("?? ��Ϣ[%d] �ĵ�[%d]: �ⲿURL - %s", i, j, url);
                 }
               }
               
-              // 处理音频
+              // ������Ƶ
               if (block.type === 'audio_url' && block.audio_url?.url) {
                 const url = block.audio_url.url;
                 if (url.startsWith('data:audio/')) {
                   const mimeMatch = url.match(/data:audio\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog("🎵 消息[%d] 音频[%d]: %s格式, 数据长度: %d字符", 
+                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
                     i, j, format, url.length);
                 } else {
-                  debugLog("🔗 消息[%d] 音频[%d]: 外部URL - %s", i, j, url);
+                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: �ⲿURL - %s", i, j, url);
                 }
               }
             }
@@ -729,7 +729,7 @@ declare namespace Deno {
         }
       }
       
-      debugLog("上游请求? %s", JSON.stringify(upstreamReq));
+      debugLog("��������? %s", JSON.stringify(upstreamReq));
       
       const response = await fetch(UPSTREAM_URL, {
         method: "POST",
@@ -749,10 +749,10 @@ declare namespace Deno {
         body: JSON.stringify(upstreamReq)
       });
       
-      debugLog("上游响应? %d %s", response.status, response.statusText);
+      debugLog("������Ӧ? %d %s", response.status, response.statusText);
       return response;
     } catch (error) {
-      debugLog("调用上游失败: %v", error);
+      debugLog("��������ʧ��: %v", error);
       throw error;
     }
   }
@@ -760,7 +760,7 @@ declare namespace Deno {
   function transformThinking(content: string): string {
     // ?<summary>?/summary>
     let result = content.replace(/<summary>.*?<\/summary>/gs, "");
-    // 清理残留自定义标签，?</thinking>?Full> ?
+    // ��������Զ����ǩ��?</thinking>?Full> ?
     result = result.replace(/<\/thinking>/g, "");
     result = result.replace(/<Full>/g, "");
     result = result.replace(/<\/Full>/g, "");
@@ -777,7 +777,7 @@ declare namespace Deno {
         break;
     }
     
-    // 处理每行前缀 "> "（包括起始位置）
+    // ����ÿ��ǰ׺ "> "��������ʼλ�ã�
     result = result.replace(/^> /, "");
     result = result.replace(/\n> /g, "\n");
     return result.trim();
@@ -800,39 +800,39 @@ declare namespace Deno {
         
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        buffer = lines.pop() || ""; // 保留最后一个不完整的行
+        buffer = lines.pop() || ""; // �������һ������������
         
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             const dataStr = line.substring(6);
             if (dataStr === "") continue;
             
-            debugLog("收到SSE数据: %s", dataStr);
+            debugLog("�յ�SSE����: %s", dataStr);
             
             try {
               const upstreamData = JSON.parse(dataStr) as UpstreamData;
               
-              // 错误检?
+              // �����?
               if (upstreamData.error || upstreamData.data.error || 
                   (upstreamData.data.inner && upstreamData.data.inner.error)) {
                 const errObj = upstreamData.error || upstreamData.data.error || 
                              (upstreamData.data.inner && upstreamData.data.inner.error);
-                debugLog("上游错误: code=%d, detail=%s", errObj?.code, errObj?.detail);
+                debugLog("���δ���: code=%d, detail=%s", errObj?.code, errObj?.detail);
                 
-                // 分析错误类型，特别是多模态相关错误
+                // �����������ͣ��ر��Ƕ�ģ̬��ش���
                 const errorDetail = (errObj?.detail || "").toLowerCase();
                 if (errorDetail.includes("something went wrong") || errorDetail.includes("try again later")) {
-                  debugLog("🚨 Z.ai 服务器错误分析");
-                  debugLog("   📋 错误详情: %s", errObj?.detail);
-                  debugLog("   🖼️ 可能原因: 图片处理失败");
-                  debugLog("   💡 建议解决方案:");
-                  debugLog("      1. 使用更小的图片(< 500KB)");
-                  debugLog("      2. 尝试不同的图片格式(JPEG 而不是PNG)");
-                  debugLog("      3. 稍后重试 (可能是服务器负载问题)");
-                  debugLog("      4. 检查图片是否损坏");
+                  debugLog("?? Z.ai �������������");
+                  debugLog("   ?? ��������: %s", errObj?.detail);
+                  debugLog("   ??? ����ԭ��: ͼƬ����ʧ��");
+                  debugLog("   ?? ����������:");
+                  debugLog("      1. ʹ�ø�С��ͼƬ(< 500KB)");
+                  debugLog("      2. ���Բ�ͬ��ͼƬ��ʽ(JPEG ������PNG)");
+                  debugLog("      3. �Ժ����� (�����Ƿ�������������)");
+                  debugLog("      4. ���ͼƬ�Ƿ���");
                 }
                 
-                // 发送结束chunk
+                // ���ͽ���chunk
                 const endChunk: OpenAIResponse = {
                   id: `chatcmpl-${Date.now()}`,
                   object: "chat.completion.chunk",
@@ -852,12 +852,12 @@ declare namespace Deno {
                 return;
               }
               
-              debugLog("解析成功 - 类型: %s, 阶段: %s, 内容长度: %d, 完成: %v",
+              debugLog("�����ɹ� - ����: %s, �׶�: %s, ���ݳ���: %d, ���: %v",
                 upstreamData.type, upstreamData.data.phase, 
                 upstreamData.data.delta_content ? upstreamData.data.delta_content.length : 0, 
                 upstreamData.data.done);
               
-              // 处理内容
+              // ��������
               if (upstreamData.data.delta_content && upstreamData.data.delta_content !== "") {
                 let out = upstreamData.data.delta_content;
                 if (upstreamData.data.phase === "thinking") {
@@ -865,7 +865,7 @@ declare namespace Deno {
                 }
                 
                 if (out !== "") {
-                  debugLog("发送内?%s): %s", upstreamData.data.phase, out);
+                  debugLog("������?%s): %s", upstreamData.data.phase, out);
                   
                   const chunk: OpenAIResponse = {
                     id: `chatcmpl-${Date.now()}`,
@@ -884,11 +884,11 @@ declare namespace Deno {
                 }
               }
               
-              // 检查是否结束
+              // ����Ƿ����
               if (upstreamData.data.done || upstreamData.data.phase === "done") {
-                debugLog("检测到流结束信号");
+                debugLog("��⵽�������ź�");
                 
-                // 发送结束chunk
+                // ���ͽ���chunk
                 const endChunk: OpenAIResponse = {
                   id: `chatcmpl-${Date.now()}`,
                   object: "chat.completion.chunk",
@@ -908,7 +908,7 @@ declare namespace Deno {
                 return;
               }
             } catch (error) {
-              debugLog("SSE数据解析失败: %v", error);
+              debugLog("SSE���ݽ���ʧ��: %v", error);
             }
           }
         }
@@ -918,7 +918,7 @@ declare namespace Deno {
     }
   }
   
-  // 收集完整响应（用于非流式响应?
+  // �ռ�������Ӧ�����ڷ���ʽ��Ӧ?
   async function collectFullResponse(body: ReadableStream<Uint8Array>): Promise<string> {
     const reader = body.getReader();
     const decoder = new TextDecoder();
@@ -932,7 +932,7 @@ declare namespace Deno {
         
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        buffer = lines.pop() || ""; // 保留最后一个不完整的行
+        buffer = lines.pop() || ""; // �������һ������������
         
         for (const line of lines) {
           if (line.startsWith("data: ")) {
@@ -953,13 +953,733 @@ declare namespace Deno {
                 }
               }
               
-              // 检查是否结束
+              // ����Ƿ����
               if (upstreamData.data.done || upstreamData.data.phase === "done") {
-                debugLog("检测到完成信号，停止收集");
+                debugLog("��⵽����źţ�ֹͣ�ռ�");
                 return fullContent;
               }
             } catch (error) {
-              // 忽略解析错误
+              // ���Խ�������
+            }
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+    
+    return fullContent;
+  }
+  
+  /**
+   * 生成首页HTML
+   */
+  function getIndexHTML(): string {
+    return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公益API - OpenAI兼容接口服务</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+        
+        .navbar-custom {
+            background-color: #2c3e50;
+            border: none;
+            min-height: 60px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-custom .navbar-brand {
+            color: #ffffff !important;
+            font-size: 22px;
+            font-weight: 700;
+            padding: 18px 15px;
+        }
+        
+        .navbar-custom .navbar-nav > li > a {
+            color: #ffffff !important;
+            font-weight: 500;
+            padding: 18px 20px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .navbar-custom .navbar-nav > li > a:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .main-content {
+            min-height: calc(100vh - 120px);
+            padding-bottom: 40px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #ffffff;
+            padding: 20px 25px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 30px 25px;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 80px 0;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+            opacity: 0.95;
+        }
+        
+        .hero-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-lg {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+        }
+        
+        .footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+        
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #27ae60;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-custom">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">🌟 公益API</a>
+            </div>
+            <ul class="navbar-nav navbar-right">
+                <li><a href="/v1/models">🤖 模型列表</a></li>
+                <li><a href="https://www.nodeloc.com/u/pastking" target="_blank">👤 开发者</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">公益API</h1>
+                    <div class="hero-subtitle">免费 OpenAI 兼容接口服务</div>
+                    <p class="hero-description">
+                        为开发者提供免费、稳定的GLM-4.5模型API访问服务，完全兼容OpenAI接口标准。
+                    </p>
+                    <div>
+                        <span class="status-indicator"></span>
+                        <span style="color: rgba(255,255,255,0.9);">服务运行中</span>
+                        <div style="margin-top: 20px;">
+                            <a href="/v1/models" class="btn btn-primary btn-lg">🚀 查看可用模型</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    🤖 公益API服务
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4 style="margin-top: 0;">GLM-4.5 AI模型</h4>
+                            <p class="text-muted">提供高质量的文本生成和多模态理解能力，支持OpenAI API标准。</p>
+                            <div style="margin: 20px 0;">
+                                <p><strong>API地址:</strong> <code>当前域名</code></p>
+                                <p><strong>聊天接口:</strong> <code>/v1/chat/completions</code></p>
+                                <p><strong>模型列表:</strong> <code>/v1/models</code></p>
+                                <p><strong>授权方式:</strong> Bearer your-api-key（任意字符串即可）</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <a href="/v1/models" class="btn btn-success btn-lg">查看模型列表</a>
+                            <div style="margin-top: 15px;">
+                                <small class="text-muted">🎉 完全免费使用</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p style="margin-bottom: 0;">
+                © <a href="https://www.nodeloc.com/u/pastking" target="_blank">PastKing</a>
+                <br>
+                <small style="opacity: 0.8;">基于 Deno 构建 · 免费开源 · 服务开发者社区</small>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>`;
+  }
+
+  /**
+   * HTTP服务器和路由处理
+   */
+  
+  function getLiveRequestsData(): string {
+    try {
+      // ȷ��liveRequests������
+      if (!Array.isArray(liveRequests)) {
+        debugLog("liveRequests�������飬����Ϊ������");
+        liveRequests = [];
+      }
+      
+      // ȷ�����ص����ݸ�ʽ��ǰ��������һ��
+      const requestData = liveRequests.map(req => ({
+        id: req.id || "",
+        timestamp: req.timestamp || new Date(),
+        method: req.method || "",
+        path: req.path || "",
+        status: req.status || 0,
+        duration: req.duration || 0,
+        user_agent: req.userAgent || ""
+      }));
+      
+      return JSON.stringify(requestData);
+    } catch (error) {
+      debugLog("��ȡʵʱ��������ʧ��: %v", error);
+      return JSON.stringify([]);
+    }
+  }
+  
+  function getStatsData(): string {
+    try {
+      // ȷ��stats�������
+      if (!stats) {
+        debugLog("stats���󲻴��ڣ�ʹ��Ĭ��ֵ");
+        stats = {
+          totalRequests: 0,
+          successfulRequests: 0,
+          failedRequests: 0,
+          lastRequestTime: new Date(),
+          averageResponseTime: 0
+        };
+      }
+      
+      // ȷ�����ص����ݸ�ʽ��ǰ��������һ?
+      const statsData = {
+        totalRequests: stats.totalRequests || 0,
+        successfulRequests: stats.successfulRequests || 0,
+        failedRequests: stats.failedRequests || 0,
+        averageResponseTime: stats.averageResponseTime || 0
+      };
+      
+      return JSON.stringify(statsData);
+    } catch (error) {
+      debugLog("��ȡͳ������ʧ��: %v", error);
+      return JSON.stringify({
+        totalRequests: 0,
+        successfulRequests: 0,
+        failedRequests: 0,
+        averageResponseTime: 0
+      });
+    }
+  }
+  
+  function getClientIP(request: Request): string {
+    // ���X-Forwarded-For?
+    const xff = request.headers.get("X-Forwarded-For");
+    if (xff) {
+      const ips = xff.split(",");
+      if (ips.length > 0) {
+        return ips[0].trim();
+      }
+    }
+    
+    // ���X-Real-IP?
+    const xri = request.headers.get("X-Real-IP");
+    if (xri) {
+      return xri;
+    }
+    
+    // ����Deno Deploy�������޷�ֱ�ӻ�ȡRemoteAddr������һ��Ĭ?
+    return "unknown";
+  }
+  
+  function setCORSHeaders(headers: Headers): void {
+    headers.set("Access-Control-Allow-Origin", "*");
+    headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    headers.set("Access-Control-Allow-Credentials", "true");
+  }
+  
+  function validateApiKey(authHeader: string | null): boolean {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return false;
+    }
+    
+    const apiKey = authHeader.substring(7);
+    return apiKey === DEFAULT_KEY;
+  }
+  
+  async function getAnonymousToken(): Promise<string> {
+    try {
+      const response = await fetch(`${ORIGIN_BASE}/api/v1/auths/`, {
+        method: "GET",
+        headers: {
+          "User-Agent": BROWSER_UA,
+          "Accept": "*/*",
+          "Accept-Language": "zh-CN,zh;q=0.9",
+          "X-FE-Version": X_FE_VERSION,
+          "sec-ch-ua": SEC_CH_UA,
+          "sec-ch-ua-mobile": SEC_CH_UA_MOB,
+          "sec-ch-ua-platform": SEC_CH_UA_PLAT,
+          "Origin": ORIGIN_BASE,
+          "Referer": `${ORIGIN_BASE}/`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Anonymous token request failed with status ${response.status}`);
+      }
+      
+      const data = await response.json() as { token: string };
+      if (!data.token) {
+        throw new Error("Anonymous token is empty");
+      }
+      
+      return data.token;
+    } catch (error) {
+      debugLog("��ȡ����tokenʧ��: %v", error);
+      throw error;
+    }
+  }
+  
+  // ��������API
+  async function callUpstreamWithHeaders(
+    upstreamReq: UpstreamRequest, 
+    refererChatID: string, 
+    authToken: string
+  ): Promise<Response> {
+    try {
+      debugLog("��������API: %s", UPSTREAM_URL);
+      
+      // �ر���ͼ�¼ȫ��λ��ģ̬��?
+      const hasMultimedia = upstreamReq.messages.some(msg => 
+        Array.isArray(msg.content) && 
+        msg.content.some(block => 
+          ['image_url', 'video_url', 'document_url', 'audio_url'].includes(block.type)
+        )
+      );
+      
+      if (hasMultimedia) {
+        debugLog("?? ���������ģ̬���ݣ����ڷ��͵�����...");
+        
+        for (let i = 0; i < upstreamReq.messages.length; i++) {
+          const msg = upstreamReq.messages[i];
+          if (Array.isArray(msg.content)) {
+            for (let j = 0; j < msg.content.length; j++) {
+              const block = msg.content[j];
+              
+              // ����ͼ��
+              if (block.type === 'image_url' && block.image_url?.url) {
+                const url = block.image_url.url;
+                if (url.startsWith('data:image/')) {
+                  const mimeMatch = url.match(/data:image\/([^;]+)/);
+                  const format = mimeMatch ? mimeMatch[1] : 'unknown';
+                  const sizeKB = Math.round(url.length * 0.75 / 1024); // base64 ��Լ��ԭ�ļ�?1.33 ?
+                  debugLog("???��Ϣ[%d] ͼ��[%d]: %s��ʽ, ���ݳ���: %d�ַ� (~%dKB)", 
+                    i, j, format, url.length, sizeKB);
+                  
+                  // ͼƬ��С����
+                  if (sizeKB > 1000) {
+                    debugLog("??  ͼƬ�ϴ� (%dKB)�����ܵ������δ���ʧ��", sizeKB);
+                    debugLog("?? ����: ��ͼƬѹ���� 500KB ����");
+                  } else if (sizeKB > 500) {
+                    debugLog("??  ͼƬƫ�� (%dKB)������ѹ��", sizeKB);
+                  }
+                } else {
+                  debugLog("?? ��Ϣ[%d] ͼ��[%d]: �ⲿURL - %s", i, j, url);
+                }
+              }
+              
+              // ������Ƶ
+              if (block.type === 'video_url' && block.video_url?.url) {
+                const url = block.video_url.url;
+                if (url.startsWith('data:video/')) {
+                  const mimeMatch = url.match(/data:video\/([^;]+)/);
+                  const format = mimeMatch ? mimeMatch[1] : 'unknown';
+                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
+                    i, j, format, url.length);
+                } else {
+                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: �ⲿURL - %s", i, j, url);
+                }
+              }
+              
+              // �����ĵ�
+              if (block.type === 'document_url' && block.document_url?.url) {
+                const url = block.document_url.url;
+                if (url.startsWith('data:application/')) {
+                  const mimeMatch = url.match(/data:application\/([^;]+)/);
+                  const format = mimeMatch ? mimeMatch[1] : 'unknown';
+                  debugLog("?? ��Ϣ[%d] �ĵ�[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
+                    i, j, format, url.length);
+                } else {
+                  debugLog("?? ��Ϣ[%d] �ĵ�[%d]: �ⲿURL - %s", i, j, url);
+                }
+              }
+              
+              // ������Ƶ
+              if (block.type === 'audio_url' && block.audio_url?.url) {
+                const url = block.audio_url.url;
+                if (url.startsWith('data:audio/')) {
+                  const mimeMatch = url.match(/data:audio\/([^;]+)/);
+                  const format = mimeMatch ? mimeMatch[1] : 'unknown';
+                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
+                    i, j, format, url.length);
+                } else {
+                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: �ⲿURL - %s", i, j, url);
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      debugLog("��������? %s", JSON.stringify(upstreamReq));
+      
+      const response = await fetch(UPSTREAM_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "User-Agent": BROWSER_UA,
+          "Authorization": `Bearer ${authToken}`,
+          "Accept-Language": "zh-CN",
+          "sec-ch-ua": SEC_CH_UA,
+          "sec-ch-ua-mobile": SEC_CH_UA_MOB,
+          "sec-ch-ua-platform": SEC_CH_UA_PLAT,
+          "X-FE-Version": X_FE_VERSION,
+          "Origin": ORIGIN_BASE,
+          "Referer": `${ORIGIN_BASE}/c/${refererChatID}`
+        },
+        body: JSON.stringify(upstreamReq)
+      });
+      
+      debugLog("������Ӧ? %d %s", response.status, response.statusText);
+      return response;
+    } catch (error) {
+      debugLog("��������ʧ��: %v", error);
+      throw error;
+    }
+  }
+  
+  function transformThinking(content: string): string {
+    // ?<summary>?/summary>
+    let result = content.replace(/<summary>.*?<\/summary>/gs, "");
+    // ��������Զ����ǩ��?</thinking>?Full> ?
+    result = result.replace(/<\/thinking>/g, "");
+    result = result.replace(/<Full>/g, "");
+    result = result.replace(/<\/Full>/g, "");
+    result = result.trim();
+    
+    switch (THINK_TAGS_MODE as "strip" | "think" | "raw") {
+      case "think":
+        result = result.replace(/<details[^>]*>/g, "<thinking>");
+        result = result.replace(/<\/details>/g, "</thinking>");
+        break;
+      case "strip":
+        result = result.replace(/<details[^>]*>/g, "");
+        result = result.replace(/<\/details>/g, "");
+        break;
+    }
+    
+    // ����ÿ��ǰ׺ "> "��������ʼλ�ã�
+    result = result.replace(/^> /, "");
+    result = result.replace(/\n> /g, "\n");
+    return result.trim();
+  }
+  
+  async function processUpstreamStream(
+    body: ReadableStream<Uint8Array>,
+    writer: WritableStreamDefaultWriter<Uint8Array>,
+    encoder: TextEncoder,
+    modelName: string
+  ): Promise<void> {
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ""; // �������һ������������
+        
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const dataStr = line.substring(6);
+            if (dataStr === "") continue;
+            
+            debugLog("�յ�SSE����: %s", dataStr);
+            
+            try {
+              const upstreamData = JSON.parse(dataStr) as UpstreamData;
+              
+              // �����?
+              if (upstreamData.error || upstreamData.data.error || 
+                  (upstreamData.data.inner && upstreamData.data.inner.error)) {
+                const errObj = upstreamData.error || upstreamData.data.error || 
+                             (upstreamData.data.inner && upstreamData.data.inner.error);
+                debugLog("���δ���: code=%d, detail=%s", errObj?.code, errObj?.detail);
+                
+                // �����������ͣ��ر��Ƕ�ģ̬��ش���
+                const errorDetail = (errObj?.detail || "").toLowerCase();
+                if (errorDetail.includes("something went wrong") || errorDetail.includes("try again later")) {
+                  debugLog("?? Z.ai �������������");
+                  debugLog("   ?? ��������: %s", errObj?.detail);
+                  debugLog("   ??? ����ԭ��: ͼƬ����ʧ��");
+                  debugLog("   ?? ����������:");
+                  debugLog("      1. ʹ�ø�С��ͼƬ(< 500KB)");
+                  debugLog("      2. ���Բ�ͬ��ͼƬ��ʽ(JPEG ������PNG)");
+                  debugLog("      3. �Ժ����� (�����Ƿ�������������)");
+                  debugLog("      4. ���ͼƬ�Ƿ���");
+                }
+                
+                // ���ͽ���chunk
+                const endChunk: OpenAIResponse = {
+                  id: `chatcmpl-${Date.now()}`,
+                  object: "chat.completion.chunk",
+                  created: Math.floor(Date.now() / 1000),
+                  model: modelName,
+                  choices: [
+                    {
+                      index: 0,
+                      delta: {},
+                      finish_reason: "stop"
+                    }
+                  ]
+                };
+                
+                await writer.write(encoder.encode(`data: ${JSON.stringify(endChunk)}\n\n`));
+                await writer.write(encoder.encode("data: [DONE]\n\n"));
+                return;
+              }
+              
+              debugLog("�����ɹ� - ����: %s, �׶�: %s, ���ݳ���: %d, ���: %v",
+                upstreamData.type, upstreamData.data.phase, 
+                upstreamData.data.delta_content ? upstreamData.data.delta_content.length : 0, 
+                upstreamData.data.done);
+              
+              // ��������
+              if (upstreamData.data.delta_content && upstreamData.data.delta_content !== "") {
+                let out = upstreamData.data.delta_content;
+                if (upstreamData.data.phase === "thinking") {
+                  out = transformThinking(out);
+                }
+                
+                if (out !== "") {
+                  debugLog("������?%s): %s", upstreamData.data.phase, out);
+                  
+                  const chunk: OpenAIResponse = {
+                    id: `chatcmpl-${Date.now()}`,
+                    object: "chat.completion.chunk",
+                    created: Math.floor(Date.now() / 1000),
+                    model: modelName,
+                    choices: [
+                      {
+                        index: 0,
+                        delta: { content: out }
+                      }
+                    ]
+                  };
+                  
+                  await writer.write(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
+                }
+              }
+              
+              // ����Ƿ����
+              if (upstreamData.data.done || upstreamData.data.phase === "done") {
+                debugLog("��⵽�������ź�");
+                
+                // ���ͽ���chunk
+                const endChunk: OpenAIResponse = {
+                  id: `chatcmpl-${Date.now()}`,
+                  object: "chat.completion.chunk",
+                  created: Math.floor(Date.now() / 1000),
+                  model: modelName,
+                  choices: [
+                    {
+                      index: 0,
+                      delta: {},
+                      finish_reason: "stop"
+                    }
+                  ]
+                };
+                
+                await writer.write(encoder.encode(`data: ${JSON.stringify(endChunk)}\n\n`));
+                await writer.write(encoder.encode("data: [DONE]\n\n"));
+                return;
+              }
+            } catch (error) {
+              debugLog("SSE���ݽ���ʧ��: %v", error);
+            }
+          }
+        }
+      }
+    } finally {
+      writer.close();
+    }
+  }
+  
+  // �ռ�������Ӧ�����ڷ���ʽ��Ӧ?
+  async function collectFullResponse(body: ReadableStream<Uint8Array>): Promise<string> {
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let fullContent = "";
+    
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ""; // �������һ������������
+        
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const dataStr = line.substring(6);
+            if (dataStr === "") continue;
+            
+            try {
+              const upstreamData = JSON.parse(dataStr) as UpstreamData;
+              
+              if (upstreamData.data.delta_content !== "") {
+                let out = upstreamData.data.delta_content;
+                if (upstreamData.data.phase === "thinking") {
+                  out = transformThinking(out);
+                }
+                
+                if (out !== "") {
+                  fullContent += out;
+                }
+              }
+              
+              // ����Ƿ����
+              if (upstreamData.data.done || upstreamData.data.phase === "done") {
+                debugLog("��⵽����źţ�ֹͣ�ռ�");
+                return fullContent;
+              }
+            } catch (error) {
+              // ���Խ�������
             }
           }
         }
@@ -981,11 +1701,11 @@ declare namespace Deno {
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>公益API - 专业OpenAI兼容接口服务</title>
+      <title>����API - רҵOpenAI���ݽӿڷ���</title>
       <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
       <style>
-          /* 基础样式重置 */
+          /* ������ʽ���� */
           * {
               box-sizing: border-box;
           }
@@ -999,7 +1719,7 @@ declare namespace Deno {
               color: #2c3e50;
           }
           
-          /* 导航栏样?*/
+          /* ��������?*/
           .navbar-custom {
               background-color: #2c3e50;
               border: none;
@@ -1036,7 +1756,7 @@ declare namespace Deno {
               text-decoration: none;
           }
           
-          /* 容器和主要内容样?*/
+          /* ��������Ҫ������?*/
           .main-content {
               min-height: calc(100vh - 60px);
               padding: 40px 0;
@@ -1048,7 +1768,7 @@ declare namespace Deno {
               padding: 0 15px;
           }
           
-          /* 卡片样式 */
+          /* ��Ƭ��ʽ */
           .card {
               background: #ffffff;
               border-radius: 8px;
@@ -1077,7 +1797,7 @@ declare namespace Deno {
               padding: 30px;
           }
           
-          /* 英雄区域样式 */
+          /* Ӣ��������ʽ */
           .hero-section {
               background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
               color: white;
@@ -1127,7 +1847,7 @@ declare namespace Deno {
               line-height: 1.7;
           }
           
-          /* 按钮样式 */
+          /* ��ť��ʽ */
           .btn {
               padding: 12px 25px;
               font-size: 16px;
@@ -1173,7 +1893,7 @@ declare namespace Deno {
               font-size: 18px;
           }
           
-          /* 特性卡片网?*/
+          /* ���Կ�Ƭ��?*/
           .features-grid {
               display: grid;
               grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1215,7 +1935,7 @@ declare namespace Deno {
               line-height: 1.6;
           }
           
-          /* 页脚样式 */
+          /* ҳ����ʽ */
           .footer {
               background-color: #2c3e50;
               color: #ffffff;
@@ -1235,7 +1955,7 @@ declare namespace Deno {
               text-decoration: none;
           }
           
-          /* 状态指示器 */
+          /* ״ָ̬ʾ�� */
           .status-indicator {
               display: inline-block;
               width: 12px;
@@ -1252,7 +1972,7 @@ declare namespace Deno {
               100% { opacity: 1; }
           }
           
-          /* 响应式设?*/
+          /* ��Ӧʽ��?*/
           @media (max-width: 768px) {
               .main-content {
                   padding: 20px 0;
@@ -1299,7 +2019,7 @@ declare namespace Deno {
               }
           }
           
-          /* 实用工具?*/
+          /* ʵ�ù���?*/
           .text-center { text-align: center; }
           .text-right { text-align: right; }
           .mb-0 { margin-bottom: 0 !important; }
@@ -1313,7 +2033,7 @@ declare namespace Deno {
   </style>
   </head>
   <body>
-      <!-- 导航?-->
+      <!-- ����?-->
       <nav class="navbar navbar-custom">
   <div class="container">
               <div class="navbar-header">
@@ -1323,100 +2043,100 @@ declare namespace Deno {
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                   </button>
-                  <a class="navbar-brand" href="/">🌟 公益API</a>
+                  <a class="navbar-brand" href="/">?? ����API</a>
               </div>
               <div class="collapse navbar-collapse" id="navbar-collapse">
                   <ul class="navbar-nav navbar-right">
-                      <li><a href="/v1/models">🤖 模型列表</a></li>
-                      <li><a href="https://www.nodeloc.com/u/pastking" target="_blank">👤 开发?/a></li>
+                      <li><a href="/v1/models">?? ģ���б�</a></li>
+                      <li><a href="HTTP服务器和路由处理
           </ul>
       </div>
           </div>
       </nav>
 
-      <!-- 主要内容 -->
+      <!-- ��Ҫ���� -->
       <div class="main-content">
           <div class="container">
-              <!-- 英雄区域 -->
+              <!-- Ӣ������ -->
               <div class="hero-section">
                   <div class="hero-content">
-                      <h1 class="hero-title">公益API</h1>
-                      <div class="hero-subtitle">专业?OpenAI 兼容接口服务</div>
+                      <h1 class="hero-title">����API</h1>
+                      <div class="hero-subtitle">רҵ?OpenAI ���ݽӿڷ���</div>
                       <p class="hero-description">
-                          提供免费、稳定、高性能?GLM-4.5 模型访问服务，完全兼?OpenAI 接口标准?
-                          为开发者和研究者提供便捷的AI能力接入，助力创新应用开发?
+                          �ṩ��ѡ��ȶ���������?GLM-4.5 ģ�ͷ��ʷ�����ȫ��?OpenAI �ӿڱ�׼?
+                          Ϊ�����ߺ��о����ṩ��ݵ�AI�������룬��������Ӧ�ÿ���?
                       </p>
                       <div class="text-center">
                           <span class="status-indicator"></span>
-                          <span style="color: rgba(255,255,255,0.9);">服务运行?/span>
+                          <span style="color: rgba(255,255,255,0.9);">��������?/span>
                           <div class="mt-2">
-                              <a href="/v1/models" class="btn btn-primary btn-lg">🚀 开始使?/a>
+                              <a href="/v1/models" class="btn btn-primary btn-lg">?? ��ʼʹ?/a>
               </div>
               </div>
               </div>
           </div>
           
-              <!-- API访问卡片 -->
+              <!-- API���ʿ�Ƭ -->
               <div class="card">
                   <div class="card-header">
-                      🤖 可用模型
+                      ?? ����ģ��
               </div>
                   <div class="card-body">
                       <div class="row">
                           <div class="col-md-8">
-                              <h4 class="mt-0">GLM-4.5 系列模型</h4>
-                              <p class="text-muted">支持文本生成、多模态理解等多种AI能力，兼容OpenAI标准接口?/p>
+                              <h4 class="mt-0">GLM-4.5 ϵ��ģ��</h4>
+                              <p class="text-muted">֧���ı����ɡ���ģ̬���ȶ���AI����������OpenAI��׼�ӿ�?/p>
                               <ul class="list-unstyled">
-                                  <li><strong>GLM-4.5</strong> - 高性能文本生成模型</li>
-                                  <li><strong>GLM-4.5V</strong> - 多模态理解模型（图像、视频、文档）</li>
+                                  <li><strong>GLM-4.5</strong> - �������ı�����ģ��</li>
+                                  <li><strong>GLM-4.5V</strong> - ��ģ̬���ģ�ͣ�ͼ����Ƶ���ĵ���</li>
                               </ul>
               </div>
                           <div class="col-md-4 text-center">
-                              <a href="/v1/models" class="btn btn-success">查看模型列表</a>
+                              <a href="/v1/models" class="btn btn-success">�鿴ģ���б�</a>
                               <div class="mt-2">
-                                  <small class="text-muted">完全免费使用</small>
+                                  <small class="text-muted">��ȫ���ʹ��</small>
               </div>
               </div>
           </div>
           </div>
           </div>
           
-              <!-- 特性展?-->
+              <!-- ����չ?-->
               <div class="card">
                   <div class="card-header">
-                      ?核心特?
+                      ?������?
           </div>
                   <div class="card-body">
                       <div class="features-grid">
                           <div class="feature-card">
                               <div class="feature-icon">?/div>
-                              <h4 class="feature-title">高性能</h4>
-                              <p class="feature-description">优化的请求处理和流式响应，确保快速稳定的API访问体验</p>
+                              <h4 class="feature-title">������</h4>
+                              <p class="feature-description">�Ż������������ʽ��Ӧ��ȷ�������ȶ���API��������</p>
           </div>
                           <div class="feature-card">
-                              <div class="feature-icon">🔒</div>
-                              <h4 class="feature-title">安全可靠</h4>
-                              <p class="feature-description">采用企业级安全措施，保障数据传输和API访问的安全?/p>
+                              <div class="feature-icon">??</div>
+                              <h4 class="feature-title">��ȫ�ɿ�</h4>
+                              <p class="feature-description">������ҵ����ȫ��ʩ���������ݴ����API���ʵİ�ȫ?/p>
                           </div>
                           <div class="feature-card">
-                              <div class="feature-icon">🔄</div>
-                              <h4 class="feature-title">完全兼容</h4>
-                              <p class="feature-description">100% 兼容 OpenAI API 标准，无需修改现有代码即可切换使用</p>
+                              <div class="feature-icon">??</div>
+                              <h4 class="feature-title">��ȫ����</h4>
+                              <p class="feature-description">100% ���� OpenAI API ��׼�������޸����д��뼴���л�ʹ��</p>
                           </div>
                           <div class="feature-card">
-                              <div class="feature-icon">🌐</div>
-                              <h4 class="feature-title">多模态支?/h4>
-                              <p class="feature-description">支持文本、图像、视频等多种数据格式的智能处理和理解</p>
+                              <div class="feature-icon">??</div>
+                              <h4 class="feature-title">��ģ̬֧?/h4>
+                              <p class="feature-description">֧���ı���ͼ����Ƶ�ȶ������ݸ�ʽ�����ܴ�������</p>
                           </div>
                           <div class="feature-card">
-                              <div class="feature-icon">💰</div>
-                              <h4 class="feature-title">完全免费</h4>
-                              <p class="feature-description">公益性质服务，无需付费即可享受专业级的AI接口服务</p>
+                              <div class="feature-icon">??</div>
+                              <h4 class="feature-title">��ȫ���</h4>
+                              <p class="feature-description">�������ʷ������踶�Ѽ�������רҵ����AI�ӿڷ���</p>
                           </div>
                           <div class="feature-card">
-                              <div class="feature-icon">📊</div>
-                              <h4 class="feature-title">实时监控</h4>
-                              <p class="feature-description">提供详细的使用统计和性能监控，便于开发调试和优化</p>
+                              <div class="feature-icon">??</div>
+                              <h4 class="feature-title">ʵʱ���</h4>
+                              <p class="feature-description">�ṩ��ϸ��ʹ��ͳ�ƺ����ܼ�أ����ڿ������Ժ��Ż�</p>
                           </div>
                       </div>
                   </div>
@@ -1424,13 +2144,13 @@ declare namespace Deno {
           </div>
       </div>
 
-      <!-- 页脚 -->
+      <!-- ҳ�� -->
       <div class="footer">
           <div class="container">
               <p class="mb-0">
-                  © <a href="https://www.nodeloc.com/u/pastking" target="_blank">@https://www.nodeloc.com/u/pastking</a>
+                  ? <a href="https://www.nodeloc.com/u/pastking" target="_blank">@https://www.nodeloc.com/u/pastking</a>
                   <br>
-                  <small style="opacity: 0.8;">基于 Deno 构建 · 免费开?· 服务开发者社?/small>
+                  <small style="opacity: 0.8;">���� Deno ���� �� ��ѿ�?�� ���񿪷�����?/small>
               </p>
           </div>
   </div>
@@ -1478,7 +2198,7 @@ declare namespace Deno {
       return new Response(null, { status: 200, headers });
     }
     
-    // 支持的模型
+    // ֧�ֵ�ģ��
     const models = SUPPORTED_MODELS.map(model => ({
       id: model.name,
         object: "model",
@@ -1504,7 +2224,7 @@ declare namespace Deno {
     const path = url.pathname;
     const userAgent = request.headers.get("User-Agent") || "";
     
-    debugLog("收到chat completions请求");
+    debugLog("�յ�chat completions����");
     
     const headers = new Headers();
     setCORSHeaders(headers);
@@ -1513,10 +2233,10 @@ declare namespace Deno {
       return new Response(null, { status: 200, headers });
     }
     
-    // 验证API Key
+    // ��֤API Key
     const authHeader = request.headers.get("Authorization");
     if (!validateApiKey(authHeader)) {
-      debugLog("缺少或无效的Authorization头");
+      debugLog("ȱ�ٻ���Ч��Authorizationͷ");
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 401);
       addLiveRequest(request.method, path, 401, duration, userAgent);
@@ -1526,12 +2246,12 @@ declare namespace Deno {
       });
     }
     
-    // 读取请求体
+    // ��ȡ������
     let body: string;
     try {
       body = await request.text();
     } catch (error) {
-      debugLog("读取请求体失败: %v", error);
+      debugLog("��ȡ������ʧ��: %v", error);
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 400);
       addLiveRequest(request.method, path, 400, duration, userAgent);
@@ -1541,12 +2261,12 @@ declare namespace Deno {
       });
     }
     
-    // 解析请求
+    // ��������
     let req: OpenAIRequest;
     try {
       req = JSON.parse(body) as OpenAIRequest;
     } catch (error) {
-      debugLog("JSON解析失败: %v", error);
+      debugLog("JSON����ʧ��: %v", error);
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 400);
       addLiveRequest(request.method, path, 400, duration, userAgent);
@@ -1556,22 +2276,22 @@ declare namespace Deno {
       });
     }
     
-    // 如果客户端没有明确指定stream参数，使用默认值
+    // ����ͻ���û����ȷָ��stream������ʹ��Ĭ��ֵ
     if (!body.includes('"stream"')) {
       req.stream = DEFAULT_STREAM;
     }
     
-    // 获取模型配置
+    // ��ȡģ������
     const modelConfig = getModelConfig(req.model);
     
-    // 处理和验证消息
+    // �������֤��Ϣ
     const processedMessages = processMessages(req.messages, modelConfig);
     
-    // 生成会话相关ID
+    // ���ɻỰ���ID
     const chatID = `${Date.now()}-${Math.floor(Date.now() / 1000)}`;
     const msgID = Date.now().toString();
     
-    // 构造上游请求
+    // ������������
     const upstreamReq: UpstreamRequest = {
       stream: true,
       chat_id: chatID,
@@ -1597,18 +2317,18 @@ declare namespace Deno {
       }
     };
     
-    // 选择token
+    // ѡ��token
     let authToken = ZAI_TOKEN;
     if (ANON_TOKEN_ENABLED) {
       try {
         const anonToken = await getAnonymousToken();
         authToken = anonToken;
       } catch (error) {
-        debugLog("匿名token获取失败，回退固定token: %v", error);
+        debugLog("����token��ȡʧ�ܣ����˹̶�token: %v", error);
       }
     }
     
-    // 调用上游API
+    // ��������API
     try {
       if (req.stream) {
         return await handleStreamResponse(upstreamReq, chatID, authToken, startTime, path, userAgent, req, modelConfig);
@@ -1616,7 +2336,7 @@ declare namespace Deno {
         return await handleNonStreamResponse(upstreamReq, chatID, authToken, startTime, path, userAgent, req, modelConfig);
       }
     } catch (error) {
-      debugLog("调用上游失败: %v", error);
+      debugLog("��������ʧ��: %v", error);
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 502);
       addLiveRequest(request.method, path, 502, duration, userAgent);
@@ -1654,12 +2374,12 @@ declare namespace Deno {
         return new Response("Upstream response body is empty", { status: 502 });
       }
       
-      // 创建流式响应
+      // ������ʽ��Ӧ
       const { readable, writable } = new TransformStream();
       const writer = writable.getWriter();
       const encoder = new TextEncoder();
       
-      // 发送第一个chunk
+      // ���͵�һ��chunk
       const firstChunk: OpenAIResponse = {
         id: `chatcmpl-${Date.now()}`,
         object: "chat.completion.chunk",
@@ -1675,12 +2395,12 @@ declare namespace Deno {
       
       writer.write(encoder.encode(`data: ${JSON.stringify(firstChunk)}\n\n`));
       
-      // 处理上游流
+      // ����������
       processUpstreamStream(response.body, writer, encoder, req.model).catch(error => {
-        debugLog("处理上游流时出错: %v", error);
+        debugLog("����������ʱ����: %v", error);
       });
       
-      // 记录成功统计
+      // ��¼�ɹ�ͳ��
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 200);
       addLiveRequest("POST", path, 200, duration, userAgent, modelConfig.name);
@@ -1732,10 +2452,10 @@ declare namespace Deno {
         return new Response("Upstream response body is empty", { status: 502 });
       }
       
-      // 收集完整响应
+      // �ռ�������Ӧ
       const finalContent = await collectFullResponse(response.body);
       
-      // 构造响应
+      // ������Ӧ
       const openAIResponse: OpenAIResponse = {
         id: `chatcmpl-${Date.now()}`,
         object: "chat.completion",
@@ -1758,7 +2478,7 @@ declare namespace Deno {
         }
       };
       
-      // 记录成功统计
+      // ��¼�ɹ�ͳ��
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 200);
       addLiveRequest("POST", path, 200, duration, userAgent, modelConfig.name);
@@ -1781,28 +2501,28 @@ declare namespace Deno {
     }
   }
   
-  // Dashboard和文档功能已移除
+  // Dashboard���ĵ��������Ƴ�
 
-  // 主HTTP服务器
+  // ��HTTP服务器和路由处理
   async function main() {
-  console.log(`OpenAI兼容API服务器启动`);
-  console.log(`支持的模型: ${SUPPORTED_MODELS.map(m => `${m.id} (${m.name})`).join(', ')}`);
-  console.log(`上游: ${UPSTREAM_URL}`);
-  console.log(`Debug模式: ${DEBUG_MODE}`);
-  console.log(`默认流式响应: ${DEFAULT_STREAM}`);
-  console.log(`Dashboard启用: ${DASHBOARD_ENABLED}`);
+  console.log(`OpenAI����API���������`);
+  console.log(`֧�ֵ�ģ��: ${SUPPORTED_MODELS.map(m => `${m.id} (${m.name})`).join(', ')}`);
+  console.log(`����: ${UPSTREAM_URL}`);
+  console.log(`Debugģʽ: ${DEBUG_MODE}`);
+  console.log(`Ĭ����ʽ��Ӧ: ${DEFAULT_STREAM}`);
+  console.log(`Dashboard����: ${DASHBOARD_ENABLED}`);
   
-  // 检测是否在Deno Deploy上运行
+  // ����Ƿ���Deno Deploy������
   const isDenoDeploy = Deno.env.get("DENO_DEPLOYMENT_ID") !== undefined;
   
   if (isDenoDeploy) {
-    // Deno Deploy环境
-    console.log("运行在Deno Deploy环境中");
+    // Deno Deploy����
+    console.log("������Deno Deploy������");
     Deno.serve(handleRequest);
   } else {
-    // 本地或自托管环境
+    // ���ػ����йܻ���
     const port = parseInt(Deno.env.get("PORT") || "9090");
-    console.log(`运行在本地环境中，端口: ${port}`);
+    console.log(`�����ڱ��ػ����У��˿�: ${port}`);
     
     const server = Deno.listen({ port });
     
@@ -1812,7 +2532,7 @@ declare namespace Deno {
   }
   }
   
-  // 处理HTTP连接（用于本地环境）
+  // ����HTTP服务器和路由处理
   async function handleHttp(conn: Deno.Conn) {
     const httpConn = Deno.serveHttp(conn);
     
@@ -1826,7 +2546,7 @@ declare namespace Deno {
       const userAgent = request.headers.get("User-Agent") || "";
   
   try {
-    // 路由分发
+    // ·�ɷַ�
     if (url.pathname === "/") {
       const response = await handleIndex(request);
       await respondWith(response);
@@ -1840,7 +2560,7 @@ declare namespace Deno {
     } else if (url.pathname === "/v1/chat/completions") {
       const response = await handleChatCompletions(request);
       await respondWith(response);
-      // 请求统计已在handleChatCompletions中记录
+      // ����ͳ������handleChatCompletions�м�¼
     } else {
       const response = await handleOptions(request);
       await respondWith(response);
@@ -1848,7 +2568,7 @@ declare namespace Deno {
       addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
     }
   } catch (error) {
-    debugLog("处理请求时出错: %v", error);
+    debugLog("��������ʱ����: %v", error);
     const response = new Response("Internal Server Error", { status: 500 });
     await respondWith(response);
     recordRequestStats(startTime, url.pathname, 500);
@@ -1857,14 +2577,14 @@ declare namespace Deno {
   }
   }
   
-  // 处理HTTP请求（用于Deno Deploy环境）
+  // ����HTTP服务器和路由处理
   async function handleRequest(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const startTime = Date.now();
     const userAgent = request.headers.get("User-Agent") || "";
   
     try {
-      // 路由分发
+      // ·�ɷַ�
       if (url.pathname === "/") {
         const response = await handleIndex(request);
         recordRequestStats(startTime, url.pathname, response.status);
@@ -1877,7 +2597,7 @@ declare namespace Deno {
         return response;
       } else if (url.pathname === "/v1/chat/completions") {
         const response = await handleChatCompletions(request);
-        // 请求统计已在handleChatCompletions中记录
+        // ����ͳ������handleChatCompletions�м�¼
         return response;
       } else {
         const response = await handleOptions(request);
@@ -1886,14 +2606,14 @@ declare namespace Deno {
         return response;
       }
     } catch (error) {
-      debugLog("处理请求时出错: %v", error);
+      debugLog("��������ʱ����: %v", error);
       recordRequestStats(startTime, url.pathname, 500);
       addLiveRequest(request.method, url.pathname, 500, Date.now() - startTime, userAgent);
       return new Response("Internal Server Error", { status: 500 });
     }
   }
   
-  // 启动服务器
+  // ���������
   main();
 
 
