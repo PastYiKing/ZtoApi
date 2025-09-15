@@ -585,7 +585,7 @@ declare namespace Deno {
       return xri;
     }
     
-    // 对于Deno Deploy，我们无法直接获取RemoteAddr，返回一个默认?
+    // 对于Deno Deploy，我们无法直接获取RemoteAddr，返回一个默?
     return "unknown";
   }
   
@@ -749,7 +749,7 @@ declare namespace Deno {
         body: JSON.stringify(upstreamReq)
       });
       
-      debugLog("上游响应状? %d %s", response.status, response.statusText);
+      debugLog("上游响应? %d %s", response.status, response.statusText);
       return response;
     } catch (error) {
       debugLog("调用上游失败: %v", error);
@@ -819,10 +819,10 @@ declare namespace Deno {
                              (upstreamData.data.inner && upstreamData.data.inner.error);
                 debugLog("上游错误: code=%d, detail=%s", errObj?.code, errObj?.detail);
                 
-                // 分析错误类型，特别是多模态相关错?
+                // 分析错误类型，特别是多模态相关错误
                 const errorDetail = (errObj?.detail || "").toLowerCase();
                 if (errorDetail.includes("something went wrong") || errorDetail.includes("try again later")) {
-                  debugLog("🚨 Z.ai 服务器错误分?");
+                  debugLog("🚨 Z.ai 服务器错误分析");
                   debugLog("   📋 错误详情: %s", errObj?.detail);
                   debugLog("   🖼️ 可能原因: 图片处理失败");
                   debugLog("   💡 建议解决方案:");
@@ -884,7 +884,7 @@ declare namespace Deno {
                 }
               }
               
-              // 检查是否结?
+              // 检查是否结束
               if (upstreamData.data.done || upstreamData.data.phase === "done") {
                 debugLog("检测到流结束信号");
                 
@@ -981,378 +981,476 @@ declare namespace Deno {
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>公益API - OpenAI兼容接口服务</title>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+      <title>公益API - 专业OpenAI兼容接口服务</title>
+      <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
       <style>
+          /* 基础样式重置 */
           * {
               box-sizing: border-box;
           }
           
           body {
-              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              font-size: 16px;
-              line-height: 1.6;
-              color: #2c3e50;
-              background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+              background-color: #f8f9fa;
               margin: 0;
               padding: 0;
-              min-height: 100vh;
+              line-height: 1.6;
+              color: #2c3e50;
           }
           
-          .main-container {
+          /* 导航栏样?*/
+          .navbar-custom {
+              background-color: #2c3e50;
+              border: none;
+              border-radius: 0;
+              margin-bottom: 0;
+              min-height: 60px;
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          }
+          
+          .navbar-custom .navbar-brand {
+              color: #ffffff !important;
+              font-size: 22px;
+              font-weight: 700;
+              padding: 18px 15px;
+              text-decoration: none;
+          }
+          
+          .navbar-custom .navbar-brand:hover {
+              color: #ffffff !important;
+              text-decoration: none;
+          }
+          
+          .navbar-custom .navbar-nav > li > a {
+              color: #ffffff !important;
+              font-size: 16px;
+              padding: 20px 20px;
+              transition: background-color 0.3s ease;
+              text-decoration: none;
+          }
+          
+          .navbar-custom .navbar-nav > li > a:hover {
+              background-color: rgba(255, 255, 255, 0.1) !important;
+              color: #ffffff !important;
+              text-decoration: none;
+          }
+          
+          /* 容器和主要内容样?*/
+          .main-content {
+              min-height: calc(100vh - 60px);
+              padding: 40px 0;
+          }
+          
+          .container {
               max-width: 1200px;
               margin: 0 auto;
-              padding: 40px 20px;
+              padding: 0 15px;
           }
           
+          /* 卡片样式 */
+          .card {
+              background: #ffffff;
+              border-radius: 8px;
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+              margin-bottom: 30px;
+              overflow: hidden;
+              border: 1px solid #e9ecef;
+              transition: all 0.3s ease;
+          }
+          
+          .card:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+          }
+          
+          .card-header {
+              background: #f8f9fa;
+              border-bottom: 1px solid #e9ecef;
+              padding: 20px 30px;
+              font-weight: 600;
+              font-size: 18px;
+              color: #2c3e50;
+          }
+          
+          .card-body {
+              padding: 30px;
+          }
+          
+          /* 英雄区域样式 */
           .hero-section {
-              background: white;
-              border-radius: 16px;
-              box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-              padding: 60px 40px;
-              text-align: center;
-              margin-bottom: 40px;
-              border: 1px solid rgba(0, 0, 0, 0.05);
-          }
-          
-          .logo {
-              width: 80px;
-              height: 80px;
-              background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-              border-radius: 20px;
-              margin: 0 auto 24px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
+              background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
               color: white;
-              font-size: 32px;
-              font-weight: 700;
-              letter-spacing: -1px;
-          }
-          
-          h1 {
-              font-size: 3rem;
-              font-weight: 700;
-              color: #1e3a8a;
-              margin: 0 0 16px 0;
-              letter-spacing: -0.02em;
-          }
-          
-          .subtitle {
-              font-size: 1.25rem;
-              color: #64748b;
-              margin: 0 0 24px 0;
-              font-weight: 500;
-          }
-          
-          .description {
-              font-size: 1.1rem;
-              color: #475569;
-              max-width: 600px;
-              margin: 0 auto;
-              line-height: 1.7;
-          }
-          
-          .nav-cards {
-              display: grid;
-              grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-              gap: 24px;
-              margin: 40px 0;
-          }
-          
-          .nav-card {
-              background: white;
-              border-radius: 16px;
-              padding: 32px;
               text-align: center;
-              border: 1px solid rgba(0, 0, 0, 0.05);
-              box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+              padding: 80px 30px;
+              margin-bottom: 40px;
+              border-radius: 8px;
               position: relative;
               overflow: hidden;
           }
           
-          .nav-card::before {
+          .hero-section::before {
               content: '';
               position: absolute;
               top: 0;
               left: 0;
               right: 0;
-              height: 4px;
-              background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-              transform: translateX(-100%);
-              transition: transform 0.3s ease;
+              bottom: 0;
+              background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+              opacity: 0.1;
           }
           
-          .nav-card:hover::before {
-              transform: translateX(0);
-          }
-          
-          .nav-card:hover {
-              transform: translateY(-8px);
-              box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
-              border-color: rgba(59, 130, 246, 0.1);
-          }
-          
-          .nav-card-icon {
-              width: 64px;
-              height: 64px;
-              background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-              border-radius: 16px;
-              margin: 0 auto 24px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 24px;
-              transition: all 0.3s ease;
-          }
-          
-          .nav-card:hover .nav-card-icon {
-              background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-              color: white;
-              transform: scale(1.1);
-          }
-          
-          .nav-card h3 {
-              font-size: 1.5rem;
-              font-weight: 600;
-              color: #1e3a8a;
-              margin: 0 0 12px 0;
-          }
-          
-          .nav-card p {
-              color: #64748b;
-              margin: 0 0 24px 0;
-              line-height: 1.6;
-          }
-          
-          .nav-card-btn {
-              display: inline-flex;
-              align-items: center;
-              padding: 12px 24px;
-              background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-              color: white;
-              text-decoration: none;
-              border-radius: 8px;
-              font-weight: 500;
-              transition: all 0.3s ease;
-              border: 2px solid transparent;
-          }
-          
-          .nav-card-btn:hover {
-              background: white;
-              color: #1e3a8a;
-              border-color: #1e3a8a;
-              text-decoration: none;
-              transform: translateY(-2px);
-          }
-          
-          .features-section {
-              background: white;
-              border-radius: 16px;
-              padding: 48px 40px;
-              box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-              border: 1px solid rgba(0, 0, 0, 0.05);
-              margin: 40px 0;
-          }
-          
-          .features-title {
-              text-align: center;
-              font-size: 2.5rem;
-              font-weight: 700;
-              color: #1e3a8a;
-              margin: 0 0 48px 0;
+          .hero-content {
               position: relative;
+              z-index: 1;
           }
           
-          .features-title::after {
-              content: '';
-              position: absolute;
-              bottom: -16px;
-              left: 50%;
-              transform: translateX(-50%);
-              width: 80px;
-              height: 4px;
-              background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-              border-radius: 2px;
+          .hero-title {
+              font-size: 3.5rem;
+              font-weight: 700;
+              margin-bottom: 20px;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           }
           
+          .hero-subtitle {
+              font-size: 1.3rem;
+              margin-bottom: 15px;
+              opacity: 0.95;
+              font-weight: 500;
+          }
+          
+          .hero-description {
+              font-size: 1.1rem;
+              opacity: 0.9;
+              max-width: 600px;
+              margin: 0 auto 30px auto;
+              line-height: 1.7;
+          }
+          
+          /* 按钮样式 */
+          .btn {
+              padding: 12px 25px;
+              font-size: 16px;
+              font-weight: 600;
+              border-radius: 6px;
+              border: none;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              text-decoration: none;
+              display: inline-block;
+              text-align: center;
+              line-height: 1.4;
+          }
+          
+          .btn-primary {
+              background-color: #3498db;
+              color: #ffffff;
+          }
+          
+          .btn-primary:hover {
+              background-color: #2980b9;
+              transform: translateY(-1px);
+              box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+              color: #ffffff;
+              text-decoration: none;
+          }
+          
+          .btn-success {
+              background-color: #27ae60;
+              color: #ffffff;
+          }
+          
+          .btn-success:hover {
+              background-color: #229954;
+              transform: translateY(-1px);
+              box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+              color: #ffffff;
+              text-decoration: none;
+          }
+          
+          .btn-lg {
+              padding: 15px 35px;
+              font-size: 18px;
+          }
+          
+          /* 特性卡片网?*/
           .features-grid {
               display: grid;
               grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-              gap: 32px;
+              gap: 30px;
+              margin-top: 30px;
           }
           
-          .feature-item {
+          .feature-card {
+              background: #ffffff;
+              border-radius: 8px;
+              padding: 30px;
               text-align: center;
-              padding: 24px;
-              border-radius: 12px;
-              background: #f8fafc;
+              border: 1px solid #e9ecef;
               transition: all 0.3s ease;
-              border: 1px solid rgba(0, 0, 0, 0.03);
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
           }
           
-          .feature-item:hover {
-              transform: translateY(-4px);
-              background: white;
-              box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+          .feature-card:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
           }
           
           .feature-icon {
-              font-size: 2.5rem;
-              margin-bottom: 16px;
+              font-size: 3rem;
+              margin-bottom: 20px;
               display: block;
+              color: #3498db;
           }
           
-          .feature-item h3 {
-              font-size: 1.25rem;
+          .feature-title {
+              font-size: 1.3rem;
               font-weight: 600;
-              color: #1e3a8a;
-              margin: 0 0 12px 0;
+              color: #2c3e50;
+              margin-bottom: 15px;
           }
           
-          .feature-item p {
-              color: #64748b;
-              margin: 0;
+          .feature-description {
+              color: #7f8c8d;
               line-height: 1.6;
           }
           
+          /* 页脚样式 */
           .footer {
+              background-color: #2c3e50;
+              color: #ffffff;
               text-align: center;
-              padding: 40px 0;
-              color: #94a3b8;
-              font-size: 0.95rem;
+              padding: 30px 0;
+              margin-top: 60px;
+          }
+          
+          .footer a {
+              color: #3498db;
+              text-decoration: none;
+              font-weight: 500;
+          }
+          
+          .footer a:hover {
+              color: #5dade2;
+              text-decoration: none;
+          }
+          
+          /* 状态指示器 */
+          .status-indicator {
+              display: inline-block;
+              width: 12px;
+              height: 12px;
+              border-radius: 50%;
+              background-color: #27ae60;
+              margin-right: 8px;
+              animation: pulse 2s infinite;
+          }
+          
+          @keyframes pulse {
+              0% { opacity: 1; }
+              50% { opacity: 0.6; }
+              100% { opacity: 1; }
           }
           
           /* 响应式设?*/
           @media (max-width: 768px) {
-              .main-container {
-                  padding: 20px 15px;
+              .main-content {
+                  padding: 20px 0;
               }
               
               .hero-section {
-                  padding: 40px 24px;
+                  padding: 50px 20px;
               }
               
-              h1 {
-                  font-size: 2.25rem;
+              .hero-title {
+                  font-size: 2.5rem;
               }
               
-              .nav-cards {
-                  grid-template-columns: 1fr;
-                  gap: 16px;
+              .hero-subtitle {
+                  font-size: 1.1rem;
               }
               
-              .nav-card {
-                  padding: 24px;
+              .card-body {
+                  padding: 20px;
               }
               
-              .features-section {
-                  padding: 32px 24px;
+              .btn {
+                  padding: 10px 20px;
+                  font-size: 14px;
               }
               
               .features-grid {
                   grid-template-columns: 1fr;
                   gap: 20px;
               }
+              
+              .feature-card {
+                  padding: 20px;
+              }
           }
           
           @media (max-width: 480px) {
-              h1 {
-                  font-size: 1.875rem;
-              }
-              
-              .subtitle {
-                  font-size: 1.1rem;
-              }
-              
-              .description {
-                  font-size: 1rem;
-              }
-              
-              .nav-card {
-                  padding: 20px;
-              }
-              
-              .features-title {
+              .hero-title {
                   font-size: 2rem;
               }
+              
+      .container {
+                  padding: 0 10px;
+              }
           }
-      </style>
+          
+          /* 实用工具?*/
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+          .mb-0 { margin-bottom: 0 !important; }
+          .mb-1 { margin-bottom: 10px !important; }
+          .mb-2 { margin-bottom: 20px !important; }
+          .mb-3 { margin-bottom: 30px !important; }
+          .mt-0 { margin-top: 0 !important; }
+          .mt-1 { margin-top: 10px !important; }
+          .mt-2 { margin-top: 20px !important; }
+          .mt-3 { margin-top: 30px !important; }
+  </style>
   </head>
   <body>
-      <div class="main-container">
-          <div class="hero-section">
-              <div class="logo">🌟</div>
-              <h1>公益API</h1>
-              <div class="subtitle">免费 OpenAI 兼容接口服务</div>
-              <p class="description">提供免费?GLM-4.5 模型访问服务，完全兼?OpenAI 接口标准，为开发者和研究者提供便捷的AI能力接入?/p>
+      <!-- 导航?-->
+      <nav class="navbar navbar-custom">
+  <div class="container">
+              <div class="navbar-header">
+                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                  </button>
+                  <a class="navbar-brand" href="/">🌟 公益API</a>
               </div>
-              
-          <div class="nav-cards">
-              <div class="nav-card">
-                  <div class="nav-card-icon">🤖</div>
-                  <h3>可用模型</h3>
-                  <p>查看当前可用?AI 模型列表，了解每个模型的特性和适用场景?/p>
-                  <a href="/v1/models" class="nav-card-btn">查看模型</a>
+              <div class="collapse navbar-collapse" id="navbar-collapse">
+                  <ul class="navbar-nav navbar-right">
+                      <li><a href="/v1/models">🤖 模型列表</a></li>
+                      <li><a href="https://www.nodeloc.com/u/pastking" target="_blank">👤 开发?/a></li>
+          </ul>
+      </div>
+          </div>
+      </nav>
+
+      <!-- 主要内容 -->
+      <div class="main-content">
+          <div class="container">
+              <!-- 英雄区域 -->
+              <div class="hero-section">
+                  <div class="hero-content">
+                      <h1 class="hero-title">公益API</h1>
+                      <div class="hero-subtitle">专业?OpenAI 兼容接口服务</div>
+                      <p class="hero-description">
+                          提供免费、稳定、高性能?GLM-4.5 模型访问服务，完全兼?OpenAI 接口标准?
+                          为开发者和研究者提供便捷的AI能力接入，助力创新应用开发?
+                      </p>
+                      <div class="text-center">
+                          <span class="status-indicator"></span>
+                          <span style="color: rgba(255,255,255,0.9);">服务运行?/span>
+                          <div class="mt-2">
+                              <a href="/v1/models" class="btn btn-primary btn-lg">🚀 开始使?/a>
+              </div>
+              </div>
               </div>
           </div>
           
-          <div class="features-section">
-              <h2 class="features-title">核心特?/h2>
-              <div class="features-grid">
-                  <div class="feature-item">
-                      <span class="feature-icon">🔄</span>
-                      <h3>OpenAI 完全兼容</h3>
-                      <p>100% 兼容 OpenAI API 标准，无需修改现有代码即可无缝迁移</p>
-                  </div>
-                  
-                  <div class="feature-item">
-                      <span class="feature-icon">?/span>
-                      <h3>高性能流式响应</h3>
-                      <p>支持实时流式输出，提供流畅的用户体验和更快的响应速度</p>
-                  </div>
-                  
-                  <div class="feature-item">
-                      <span class="feature-icon">🔐</span>
-                      <h3>企业级安?/h3>
-                      <p>完善的身份验证机制和访问控制，确保数据安全和服务稳定</p>
-                  </div>
-                  
-                  <div class="feature-item">
-                      <span class="feature-icon">🛠?/span>
-                      <h3>灵活配置管理</h3>
-                      <p>通过环境变量轻松配置服务参数，支持多种部署场?/p>
-                  </div>
-                  
-                  <div class="feature-item">
-                      <span class="feature-icon">🧠</span>
-                      <h3>智能思维展示</h3>
-                      <p>可视化展示模型推理过程，帮助理解AI决策逻辑</p>
-                  </div>
-                  
-                  <div class="feature-item">
-                      <span class="feature-icon">📈</span>
-                      <h3>专业监控面板</h3>
-                      <p>实时统计分析和可视化图表，全面掌握服务运行状?/p>
-                  </div>
+              <!-- API访问卡片 -->
+              <div class="card">
+                  <div class="card-header">
+                      🤖 可用模型
+              </div>
+                  <div class="card-body">
+                      <div class="row">
+                          <div class="col-md-8">
+                              <h4 class="mt-0">GLM-4.5 系列模型</h4>
+                              <p class="text-muted">支持文本生成、多模态理解等多种AI能力，兼容OpenAI标准接口?/p>
+                              <ul class="list-unstyled">
+                                  <li><strong>GLM-4.5</strong> - 高性能文本生成模型</li>
+                                  <li><strong>GLM-4.5V</strong> - 多模态理解模型（图像、视频、文档）</li>
+                              </ul>
+              </div>
+                          <div class="col-md-4 text-center">
+                              <a href="/v1/models" class="btn btn-success">查看模型列表</a>
+                              <div class="mt-2">
+                                  <small class="text-muted">完全免费使用</small>
+              </div>
               </div>
           </div>
+          </div>
+          </div>
           
-          <div class="footer">
-              <p>© <a href="https://www.nodeloc.com/u/pastking" target="_blank" style="color: #64748b; text-decoration: none;">@https://www.nodeloc.com/u/pastking</a></p>
+              <!-- 特性展?-->
+              <div class="card">
+                  <div class="card-header">
+                      ?核心特?
+          </div>
+                  <div class="card-body">
+                      <div class="features-grid">
+                          <div class="feature-card">
+                              <div class="feature-icon">?/div>
+                              <h4 class="feature-title">高性能</h4>
+                              <p class="feature-description">优化的请求处理和流式响应，确保快速稳定的API访问体验</p>
+          </div>
+                          <div class="feature-card">
+                              <div class="feature-icon">🔒</div>
+                              <h4 class="feature-title">安全可靠</h4>
+                              <p class="feature-description">采用企业级安全措施，保障数据传输和API访问的安全?/p>
+                          </div>
+                          <div class="feature-card">
+                              <div class="feature-icon">🔄</div>
+                              <h4 class="feature-title">完全兼容</h4>
+                              <p class="feature-description">100% 兼容 OpenAI API 标准，无需修改现有代码即可切换使用</p>
+                          </div>
+                          <div class="feature-card">
+                              <div class="feature-icon">🌐</div>
+                              <h4 class="feature-title">多模态支?/h4>
+                              <p class="feature-description">支持文本、图像、视频等多种数据格式的智能处理和理解</p>
+                          </div>
+                          <div class="feature-card">
+                              <div class="feature-icon">💰</div>
+                              <h4 class="feature-title">完全免费</h4>
+                              <p class="feature-description">公益性质服务，无需付费即可享受专业级的AI接口服务</p>
+                          </div>
+                          <div class="feature-card">
+                              <div class="feature-icon">📊</div>
+                              <h4 class="feature-title">实时监控</h4>
+                              <p class="feature-description">提供详细的使用统计和性能监控，便于开发调试和优化</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
       </div>
+
+      <!-- 页脚 -->
+      <div class="footer">
+          <div class="container">
+              <p class="mb-0">
+                  © <a href="https://www.nodeloc.com/u/pastking" target="_blank">@https://www.nodeloc.com/u/pastking</a>
+                  <br>
+                  <small style="opacity: 0.8;">基于 Deno 构建 · 免费开?· 服务开发者社?/small>
+              </p>
+          </div>
+  </div>
+  
+      <!-- JavaScript -->
+      <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+      <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
   </body>
   </html>`;
   }
+  
+  /**
+   * HTTP服务器和路由处理
+   */
   
   async function handleIndex(request: Request): Promise<Response> {
     if (request.method !== "GET") {
       return new Response("Method not allowed", { status: 405 });
     }
-    
+  
     return new Response(getIndexHTML(), {
       status: 200,
       headers: {
@@ -1380,7 +1478,7 @@ declare namespace Deno {
       return new Response(null, { status: 200, headers });
     }
     
-    // 支持的模?
+    // 支持的模型
     const models = SUPPORTED_MODELS.map(model => ({
       id: model.name,
         object: "model",
@@ -1407,14 +1505,6 @@ declare namespace Deno {
     const userAgent = request.headers.get("User-Agent") || "";
     
     debugLog("收到chat completions请求");
-    debugLog("🌐 User-Agent: %s", userAgent);
-    
-    // Cherry Studio 检?
-    const isCherryStudio = userAgent.toLowerCase().includes('cherry') || userAgent.toLowerCase().includes('studio');
-    if (isCherryStudio) {
-      debugLog("🍒 检测到 Cherry Studio 客户端版? %s", 
-        userAgent.match(/CherryStudio\/([^\s]+)/)?.[1] || 'unknown');
-    }
     
     const headers = new Headers();
     setCORSHeaders(headers);
@@ -1436,19 +1526,12 @@ declare namespace Deno {
       });
     }
     
-    debugLog("API key验证通过");
-    
-    // 读取请求?
+    // 读取请求体
     let body: string;
     try {
       body = await request.text();
-      debugLog("📥 收到请求体长? %d 字符", body.length);
-      
-      // 为Cherry Studio调试：记录原始请求体（截取前1000字符避免日志过长?
-      const bodyPreview = body.length > 1000 ? body.substring(0, 1000) + "..." : body;
-      debugLog("📄 请求体预? %s", bodyPreview);
     } catch (error) {
-      debugLog("读取请求体失? %v", error);
+      debugLog("读取请求体失败: %v", error);
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 400);
       addLiveRequest(request.method, path, 400, duration, userAgent);
@@ -1462,7 +1545,6 @@ declare namespace Deno {
     let req: OpenAIRequest;
     try {
       req = JSON.parse(body) as OpenAIRequest;
-      debugLog("?JSON解析成功");
     } catch (error) {
       debugLog("JSON解析失败: %v", error);
       const duration = Date.now() - startTime;
@@ -1474,90 +1556,24 @@ declare namespace Deno {
       });
     }
     
-    // 如果客户端没有明确指定stream参数，使用默认?
+    // 如果客户端没有明确指定stream参数，使用默认值
     if (!body.includes('"stream"')) {
       req.stream = DEFAULT_STREAM;
-      debugLog("客户端未指定stream参数，使用默认? %v", DEFAULT_STREAM);
     }
     
     // 获取模型配置
     const modelConfig = getModelConfig(req.model);
-    debugLog("请求解析成功 - 模型: %s (%s), 流式: %v, 消息? %d", req.model, modelConfig.name, req.stream, req.messages.length);
     
-    // Cherry Studio 调试：详细检查每条消?
-    debugLog("🔍 Cherry Studio 调试 - 检查原始消?");
-    for (let i = 0; i < req.messages.length; i++) {
-      const msg = req.messages[i];
-      debugLog("  消息[%d] role: %s", i, msg.role);
-      
-      if (typeof msg.content === 'string') {
-        debugLog("  消息[%d] content: 字符串类? 长度: %d", i, msg.content.length);
-        if (msg.content.length === 0) {
-          debugLog("  ⚠️  消息[%d] 内容为空字符?", i);
-        } else {
-          debugLog("  消息[%d] 内容预览: %s", i, msg.content.substring(0, 100));
-        }
-      } else if (Array.isArray(msg.content)) {
-        debugLog("  消息[%d] content: 数组类型, 块数: %d", i, msg.content.length);
-        for (let j = 0; j < msg.content.length; j++) {
-          const block = msg.content[j];
-          debugLog("    块[%d] type: %s", j, block.type);
-          if (block.type === 'text' && block.text) {
-            debugLog("    块[%d] text: %s", j, block.text.substring(0, 50));
-          } else if (block.type === 'image_url' && block.image_url?.url) {
-            debugLog("    块[%d] image_url: %s格式, 长度: %d", j, 
-              block.image_url.url.startsWith('data:') ? 'base64' : 'url', 
-              block.image_url.url.length);
-          }
-        }
-      } else {
-        debugLog("  ⚠️  消息[%d] content 类型异常: %s", i, typeof msg.content);
-      }
-    }
-    
-    // 处理和验证消息（特别是多模态内容）
+    // 处理和验证消息
     const processedMessages = processMessages(req.messages, modelConfig);
-    debugLog("消息处理完成，处理后消息? %d", processedMessages.length);
-    
-    // 检查是否包含多模态内?
-    const hasMultimodal = processedMessages.some(msg => 
-      Array.isArray(msg.content) && 
-      msg.content.some(block => 
-        ['image_url', 'video_url', 'document_url', 'audio_url'].includes(block.type)
-      )
-    );
-    
-    if (hasMultimodal) {
-      debugLog("🎯 检测到全方位多模态请求，模型: %s", modelConfig.name);
-      if (!modelConfig.capabilities.vision) {
-        debugLog("❌严重错误: 模型不支持多模态，但收到了多媒体内容！");
-        debugLog("💡 Cherry Studio用户请检查: 确认选择了'glm-4.5v' 而不是'GLM-4.5'");
-        debugLog("🔧 模型映射状态: %s → %s (vision: %s)", 
-          req.model, modelConfig.upstreamId, modelConfig.capabilities.vision);
-      } else {
-        debugLog("✨GLM-4.5V支持全方位多模态理解：图像、视频、文档、音频");
-        
-        // 检查是否使用匿名token（多模态功能的重要限制）
-        if (!ZAI_TOKEN || ZAI_TOKEN.trim() === "") {
-          debugLog("⚠️ 重要警告: 正在使用匿名token处理多模态请求");
-          debugLog("💡 Z.ai的匿名token可能不支持图像/视频/文档处理");
-          debugLog("🔧 解决方案: 设置 ZAI_TOKEN 环境变量为正式的API Token");
-          debugLog("📋 如果请求失败，这很可能是token权限问题");
-        } else {
-          debugLog("✅使用正式API Token，支持完整多模态功能");
-        }
-      }
-    } else if (modelConfig.capabilities.vision && modelConfig.id === 'glm-4.5v') {
-      debugLog("ℹ️ 使用GLM-4.5V模型但未检测到多媒体数据，仅处理文本内容");
-    }
     
     // 生成会话相关ID
     const chatID = `${Date.now()}-${Math.floor(Date.now() / 1000)}`;
     const msgID = Date.now().toString();
     
-    // 构造上游请?
+    // 构造上游请求
     const upstreamReq: UpstreamRequest = {
-      stream: true, // 总是使用流式从上游获?
+      stream: true,
       chat_id: chatID,
       id: msgID,
       model: modelConfig.upstreamId,
@@ -1574,66 +1590,19 @@ declare namespace Deno {
         title_generation: false,
         tags_generation: false
       },
-      mcp_servers: modelConfig.capabilities.mcp ? [] : undefined,
-      model_item: {
-        id: modelConfig.upstreamId,
-        name: modelConfig.name,
-        owned_by: "openai",
-        openai: {
-          id: modelConfig.upstreamId,
-          name: modelConfig.upstreamId,
-          owned_by: "openai",
-          openai: {
-            id: modelConfig.upstreamId
-          },
-          urlIdx: 1
-        },
-        urlIdx: 1,
-        info: {
-          id: modelConfig.upstreamId,
-          user_id: "api-user",
-          base_model_id: null,
-          name: modelConfig.name,
-          params: modelConfig.defaultParams,
-          meta: {
-            profile_image_url: "/static/favicon.png",
-            description: modelConfig.capabilities.vision ? "Advanced visual understanding and analysis" : "Most advanced model, proficient in coding and tool use",
-            capabilities: {
-              vision: modelConfig.capabilities.vision,
-              citations: false,
-              preview_mode: modelConfig.capabilities.vision,
-              web_search: false,
-              language_detection: false,
-              restore_n_source: false,
-              mcp: modelConfig.capabilities.mcp,
-              file_qa: modelConfig.capabilities.mcp,
-              returnFc: true,
-              returnThink: modelConfig.capabilities.thinking,
-              think: modelConfig.capabilities.thinking
-            }
-          }
-        }
-      },
       tool_servers: [],
       variables: {
         "{{USER_NAME}}": `Guest-${Date.now()}`,
-        "{{USER_LOCATION}}": "Unknown",
-        "{{CURRENT_DATETIME}}": new Date().toLocaleString('zh-CN'),
-        "{{CURRENT_DATE}}": new Date().toLocaleDateString('zh-CN'),
-        "{{CURRENT_TIME}}": new Date().toLocaleTimeString('zh-CN'),
-        "{{CURRENT_WEEKDAY}}": new Date().toLocaleDateString('zh-CN', { weekday: 'long' }),
-        "{{CURRENT_TIMEZONE}}": "Asia/Shanghai",
-        "{{USER_LANGUAGE}}": "zh-CN"
+        "{{CURRENT_DATETIME}}": new Date().toLocaleString('zh-CN')
       }
     };
     
-    // 选择本次对话使用的token
+    // 选择token
     let authToken = ZAI_TOKEN;
     if (ANON_TOKEN_ENABLED) {
       try {
         const anonToken = await getAnonymousToken();
         authToken = anonToken;
-        debugLog("匿名token获取成功: %s...", anonToken.substring(0, 10));
       } catch (error) {
         debugLog("匿名token获取失败，回退固定token: %v", error);
       }
@@ -1668,13 +1637,10 @@ declare namespace Deno {
     req: OpenAIRequest,
     modelConfig: ModelConfig
   ): Promise<Response> {
-    debugLog("开始处理流式响?(chat_id=%s)", chatID);
-    
     try {
       const response = await callUpstreamWithHeaders(upstreamReq, chatID, authToken);
       
       if (!response.ok) {
-        debugLog("上游返回错误状? %d", response.status);
         const duration = Date.now() - startTime;
         recordRequestStats(startTime, path, 502);
         addLiveRequest("POST", path, 502, duration, userAgent);
@@ -1682,19 +1648,18 @@ declare namespace Deno {
       }
       
       if (!response.body) {
-        debugLog("上游响应体为空");
         const duration = Date.now() - startTime;
         recordRequestStats(startTime, path, 502);
         addLiveRequest("POST", path, 502, duration, userAgent);
         return new Response("Upstream response body is empty", { status: 502 });
       }
       
-      // 创建可读流
+      // 创建流式响应
       const { readable, writable } = new TransformStream();
       const writer = writable.getWriter();
       const encoder = new TextEncoder();
       
-      // 发送第一个chunk（role?
+      // 发送第一个chunk
       const firstChunk: OpenAIResponse = {
         id: `chatcmpl-${Date.now()}`,
         object: "chat.completion.chunk",
@@ -1708,15 +1673,14 @@ declare namespace Deno {
         ]
       };
       
-      // 写入第一个chunk
       writer.write(encoder.encode(`data: ${JSON.stringify(firstChunk)}\n\n`));
       
-      // 处理上游SSE?
+      // 处理上游流
       processUpstreamStream(response.body, writer, encoder, req.model).catch(error => {
         debugLog("处理上游流时出错: %v", error);
       });
       
-      // 记录成功请求统计
+      // 记录成功统计
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 200);
       addLiveRequest("POST", path, 200, duration, userAgent, modelConfig.name);
@@ -1734,7 +1698,6 @@ declare namespace Deno {
         }
       });
     } catch (error) {
-      debugLog("处理流式响应时出? %v", error);
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 502);
       addLiveRequest("POST", path, 502, duration, userAgent);
@@ -1752,13 +1715,10 @@ declare namespace Deno {
     req: OpenAIRequest,
     modelConfig: ModelConfig
   ): Promise<Response> {
-    debugLog("开始处理非流式响应 (chat_id=%s)", chatID);
-    
     try {
       const response = await callUpstreamWithHeaders(upstreamReq, chatID, authToken);
       
       if (!response.ok) {
-        debugLog("上游返回错误状? %d", response.status);
         const duration = Date.now() - startTime;
         recordRequestStats(startTime, path, 502);
         addLiveRequest("POST", path, 502, duration, userAgent);
@@ -1766,7 +1726,6 @@ declare namespace Deno {
       }
       
       if (!response.body) {
-        debugLog("上游响应体为空");
         const duration = Date.now() - startTime;
         recordRequestStats(startTime, path, 502);
         addLiveRequest("POST", path, 502, duration, userAgent);
@@ -1775,9 +1734,8 @@ declare namespace Deno {
       
       // 收集完整响应
       const finalContent = await collectFullResponse(response.body);
-      debugLog("内容收集完成，最终长? %d", finalContent.length);
       
-      // 构造完整响?
+      // 构造响应
       const openAIResponse: OpenAIResponse = {
         id: `chatcmpl-${Date.now()}`,
         object: "chat.completion",
@@ -1800,7 +1758,7 @@ declare namespace Deno {
         }
       };
       
-      // 记录成功请求统计
+      // 记录成功统计
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 200);
       addLiveRequest("POST", path, 200, duration, userAgent, modelConfig.name);
@@ -1816,7 +1774,6 @@ declare namespace Deno {
         }
       });
     } catch (error) {
-      debugLog("处理非流式响应时出错: %v", error);
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 502);
       addLiveRequest("POST", path, 502, duration, userAgent);
@@ -1826,15 +1783,15 @@ declare namespace Deno {
   
   // Dashboard和文档功能已移除
 
-  // 主HTTP服务?
+  // 主HTTP服务器
   async function main() {
   console.log(`OpenAI兼容API服务器启动`);
-  console.log(`支持的模? ${SUPPORTED_MODELS.map(m => `${m.id} (${m.name})`).join(', ')}`);
+  console.log(`支持的模型: ${SUPPORTED_MODELS.map(m => `${m.id} (${m.name})`).join(', ')}`);
   console.log(`上游: ${UPSTREAM_URL}`);
   console.log(`Debug模式: ${DEBUG_MODE}`);
   console.log(`默认流式响应: ${DEFAULT_STREAM}`);
   console.log(`Dashboard启用: ${DASHBOARD_ENABLED}`);
-
+  
   // 检测是否在Deno Deploy上运行
   const isDenoDeploy = Deno.env.get("DENO_DEPLOYMENT_ID") !== undefined;
   
@@ -1853,88 +1810,90 @@ declare namespace Deno {
       handleHttp(conn);
     }
   }
-}
-
-// 处理HTTP连接（用于本地环境）
-async function handleHttp(conn: Deno.Conn) {
-  const httpConn = Deno.serveHttp(conn);
-  
-  while (true) {
-    const requestEvent = await httpConn.nextRequest();
-    if (!requestEvent) break;
-    
-    const { request, respondWith } = requestEvent;
-    const url = new URL(request.url);
-    const startTime = Date.now();
-    const userAgent = request.headers.get("User-Agent") || "";
-
-try {
-  // 路由分发
-  if (url.pathname === "/") {
-    const response = await handleIndex(request);
-    await respondWith(response);
-    recordRequestStats(startTime, url.pathname, response.status);
-    addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
-  } else if (url.pathname === "/v1/models") {
-    const response = await handleModels(request);
-    await respondWith(response);
-    recordRequestStats(startTime, url.pathname, response.status);
-    addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
-  } else if (url.pathname === "/v1/chat/completions") {
-    const response = await handleChatCompletions(request);
-    await respondWith(response);
-    // 请求统计已在handleChatCompletions中记?
-  } else {
-    const response = await handleOptions(request);
-    await respondWith(response);
-    recordRequestStats(startTime, url.pathname, response.status);
-    addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
   }
-} catch (error) {
-  debugLog("处理请求时出? %v", error);
-  const response = new Response("Internal Server Error", { status: 500 });
-  await respondWith(response);
-  recordRequestStats(startTime, url.pathname, 500);
-  addLiveRequest(request.method, url.pathname, 500, Date.now() - startTime, userAgent);
-}
-}
-}
-
-// 处理HTTP请求（用于Deno Deploy环境?
-async function handleRequest(request: Request): Promise<Response> {
-  const url = new URL(request.url);
-  const startTime = Date.now();
-  const userAgent = request.headers.get("User-Agent") || "";
-
+  
+  // 处理HTTP连接（用于本地环境）
+  async function handleHttp(conn: Deno.Conn) {
+    const httpConn = Deno.serveHttp(conn);
+    
+    while (true) {
+      const requestEvent = await httpConn.nextRequest();
+      if (!requestEvent) break;
+      
+      const { request, respondWith } = requestEvent;
+      const url = new URL(request.url);
+      const startTime = Date.now();
+      const userAgent = request.headers.get("User-Agent") || "";
+  
   try {
     // 路由分发
     if (url.pathname === "/") {
       const response = await handleIndex(request);
+      await respondWith(response);
       recordRequestStats(startTime, url.pathname, response.status);
       addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
-      return response;
     } else if (url.pathname === "/v1/models") {
       const response = await handleModels(request);
+      await respondWith(response);
       recordRequestStats(startTime, url.pathname, response.status);
       addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
-      return response;
     } else if (url.pathname === "/v1/chat/completions") {
       const response = await handleChatCompletions(request);
-      // 请求统计已在handleChatCompletions中记?
-      return response;
+      await respondWith(response);
+      // 请求统计已在handleChatCompletions中记录
     } else {
       const response = await handleOptions(request);
+      await respondWith(response);
       recordRequestStats(startTime, url.pathname, response.status);
       addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
-      return response;
     }
   } catch (error) {
-    debugLog("处理请求时出? %v", error);
+    debugLog("处理请求时出错: %v", error);
+    const response = new Response("Internal Server Error", { status: 500 });
+    await respondWith(response);
     recordRequestStats(startTime, url.pathname, 500);
     addLiveRequest(request.method, url.pathname, 500, Date.now() - startTime, userAgent);
-    return new Response("Internal Server Error", { status: 500 });
   }
-}
+  }
+  }
+  
+  // 处理HTTP请求（用于Deno Deploy环境）
+  async function handleRequest(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+    const startTime = Date.now();
+    const userAgent = request.headers.get("User-Agent") || "";
+  
+    try {
+      // 路由分发
+      if (url.pathname === "/") {
+        const response = await handleIndex(request);
+        recordRequestStats(startTime, url.pathname, response.status);
+        addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
+        return response;
+      } else if (url.pathname === "/v1/models") {
+        const response = await handleModels(request);
+        recordRequestStats(startTime, url.pathname, response.status);
+        addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
+        return response;
+      } else if (url.pathname === "/v1/chat/completions") {
+        const response = await handleChatCompletions(request);
+        // 请求统计已在handleChatCompletions中记录
+        return response;
+      } else {
+        const response = await handleOptions(request);
+        recordRequestStats(startTime, url.pathname, response.status);
+        addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
+        return response;
+      }
+    } catch (error) {
+      debugLog("处理请求时出错: %v", error);
+      recordRequestStats(startTime, url.pathname, 500);
+      addLiveRequest(request.method, url.pathname, 500, Date.now() - startTime, userAgent);
+      return new Response("Internal Server Error", { status: 500 });
+    }
+  }
+  
+  // 启动服务器
+  main();
 
-// 启动服务器
-main();
+
