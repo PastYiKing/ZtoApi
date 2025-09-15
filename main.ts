@@ -97,8 +97,8 @@ declare namespace Deno {
   
   /**
    * 
-   * 上游服务请求结构
-   * 向Z.ai服务发送的请求格式
+   * ���η��������ṹ
+   * ��Z.ai�������͵�������ʽ
    */
   interface UpstreamRequest {
     stream: boolean;
@@ -193,10 +193,10 @@ declare namespace Deno {
    * 
    */
   
-  // 思考内容处理策略: strip-去除<details>标签, think-转为<thinking>标签, raw-保留原样
+  // ˼�����ݴ�������: strip-ȥ��<details>��ǩ, think-תΪ<thinking>��ǩ, raw-����ԭ��
   const THINK_TAGS_MODE = "strip";
   
-  // 伪装前端头部（来自抓包分析）
+  // αװǰ��ͷ��������ץ��������
   const X_FE_VERSION = "prod-fe-1.0.70";
   const BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0";
   const SEC_CH_UA = "\"Not;A=Brand\";v=\"99\", \"Microsoft Edge\";v=\"139\", \"Chromium\";v=\"139\"";
@@ -207,19 +207,19 @@ declare namespace Deno {
   const ANON_TOKEN_ENABLED = true;
   
   /**
-   * 环境变量配置
+   * ������������
    */
   const UPSTREAM_URL = Deno.env.get("UPSTREAM_URL") || "https://chat.z.ai/api/chat/completions";
   const DEFAULT_KEY = Deno.env.get("DEFAULT_KEY") || "sk-your-key";
   const ZAI_TOKEN = Deno.env.get("ZAI_TOKEN") || "";
   
   /**
-   * 支持的模型配置
+   * ֧�ֵ�ģ������
    */
   interface ModelConfig {
-    id: string;           // OpenAI API中的模型ID
-    name: string;         // 显示名称
-    upstreamId: string;   // Z.ai上游服务中的模型ID
+    id: string;           // OpenAI API�е�ģ��ID
+    name: string;         // ��ʾ����
+    upstreamId: string;   // Z.ai���η����е�ģ��ID
     capabilities: {
       vision: boolean;
       mcp: boolean;
@@ -269,24 +269,24 @@ declare namespace Deno {
   
   // 
   function getModelConfig(modelId: string): ModelConfig {
-    // 规范化模型ID并查找配置，Cherry Studio等客户端可能使用不同的ID格式
+    // �淶��ģ��ID���������ã�Cherry Studio�ȿͻ��˿���ʹ�ò�ͬ��ID��ʽ
     const normalizedModelId = normalizeModelId(modelId);
     const found = SUPPORTED_MODELS.find(m => m.id === normalizedModelId);
     
     if (!found) {
-(`未知模型 ${modelId} (规范化后: ${normalizedModelId})，使用默认模型 ${DEFAULT_MODEL.name}`);
+(`δ֪ģ�� ${modelId} (�淶����: ${normalizedModelId})��ʹ��Ĭ��ģ�� ${DEFAULT_MODEL.name}`);
     }
     
     return found || DEFAULT_MODEL;
   }
   
   /**
-   * Cherry Studio等客户端的模型ID规范化处理
+   * Cherry Studio�ȿͻ��˵�ģ��ID�淶������
    */
   function normalizeModelId(modelId: string): string {
     const normalized = modelId.toLowerCase().trim();
     
-    // 模型ID映射表
+    // ģ��IDӳ����
     const modelMappings: Record<string, string> = {
       'glm-4.5v': 'glm-4.5v',
       'glm4.5v': 'glm-4.5v',
@@ -301,7 +301,7 @@ declare namespace Deno {
     
     const mapped = modelMappings[normalized];
     if (mapped) {
-(`模型映射: ${normalized} -> ${mapped}`);
+(`ģ��ӳ��: ${normalized} -> ${mapped}`);
       return mapped;
     }
     
@@ -318,11 +318,11 @@ declare namespace Deno {
     for (const message of messages) {
       const processedMessage: Message = { ...message };
       
-      // 检查是否为视觉模型
+      // �����Ƿ�Ϊ�Ӿ�ģ��
       if (Array.isArray(message.content)) {
-("处理多媒体消息内容");
+("������ý����Ϣ����");
         
-        // 统计媒体类型
+        // ͳ��ý������
         const mediaStats = {
           text: 0,
           images: 0,
@@ -332,10 +332,10 @@ declare namespace Deno {
           others: 0
         };
         
-        // 检查是否为视觉模型
+        // �����Ƿ�Ϊ�Ӿ�ģ��
         if (!modelConfig.capabilities.vision) {
-("模型不支持视觉功能，转换为文本内容");
-          // 提取文本内容
+("ģ�Ͳ�֧���Ӿ����ܣ�ת��Ϊ�ı�����");
+          // ��ȡ�ı�����
           const textContent = message.content
             .filter(block => block.type === 'text')
             .map(block => block.text)
@@ -348,7 +348,7 @@ declare namespace Deno {
               case 'text':
                 if (block.text) {
                   mediaStats.text++;
-(`发现文本内容: ${block.text.substring(0, 50)}...`);
+(`�����ı�����: ${block.text.substring(0, 50)}...`);
                 }
                 break;
                 
@@ -359,11 +359,11 @@ declare namespace Deno {
                   if (url.startsWith('data:image/')) {
                     const mimeMatch = url.match(/data:image\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-(`发现Base64图片，格式: ${format}`);
+(`����Base64ͼƬ����ʽ: ${format}`);
                   } else if (url.startsWith('http')) {
-(`发现网络图片: ${url.substring(0, 50)}...`);
+(`��������ͼƬ: ${url.substring(0, 50)}...`);
                   } else {
-(`发现其他格式图片: ${url.substring(0, 30)}...`);
+(`����������ʽͼƬ: ${url.substring(0, 30)}...`);
                   }
                 }
                 break;
@@ -375,11 +375,11 @@ declare namespace Deno {
                   if (url.startsWith('data:video/')) {
                     const mimeMatch = url.match(/data:video\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-(`发现Base64视频，格式: ${format}`);
+(`����Base64��Ƶ����ʽ: ${format}`);
                   } else if (url.startsWith('http')) {
-(`发现网络视频: ${url.substring(0, 50)}...`);
+(`����������Ƶ: ${url.substring(0, 50)}...`);
                   } else {
-(`发现其他格式视频: ${url.substring(0, 30)}...`);
+(`����������ʽ��Ƶ: ${url.substring(0, 30)}...`);
                   }
                 }
                 break;
@@ -391,11 +391,11 @@ declare namespace Deno {
                   if (url.startsWith('data:application/')) {
                     const mimeMatch = url.match(/data:application\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-(`发现Base64文档，格式: ${format}`);
+(`����Base64�ĵ�����ʽ: ${format}`);
                   } else if (url.startsWith('http')) {
-(`发现网络文档: ${url.substring(0, 50)}...`);
+(`���������ĵ�: ${url.substring(0, 50)}...`);
                   } else {
-(`发现其他格式文档: ${url.substring(0, 30)}...`);
+(`����������ʽ�ĵ�: ${url.substring(0, 30)}...`);
                   }
                 }
                 break;
@@ -407,11 +407,11 @@ declare namespace Deno {
                   if (url.startsWith('data:audio/')) {
                     const mimeMatch = url.match(/data:audio\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-(`发现Base64音频，格式: ${format}`);
+(`����Base64��Ƶ����ʽ: ${format}`);
                   } else if (url.startsWith('http')) {
-(`发现网络音频: ${url.substring(0, 50)}...`);
+(`����������Ƶ: ${url.substring(0, 50)}...`);
                   } else {
-(`发现其他格式音频: ${url.substring(0, 30)}...`);
+(`����������ʽ��Ƶ: ${url.substring(0, 30)}...`);
                   }
                 }
                 break;
@@ -421,7 +421,7 @@ declare namespace Deno {
             }
           }
           
-          // 启动服务器
+          // ����������
           const totalMedia = mediaStats.images + mediaStats.videos + mediaStats.documents + mediaStats.audios;
           if (totalMedia > 0) {
           }
@@ -475,7 +475,7 @@ declare namespace Deno {
       stats.failedRequests++;
     }
     
-    // 检查是否为视觉模型
+    // �����Ƿ�Ϊ�Ӿ�ģ��
     if (stats.totalRequests > 0) {
       const totalDuration = stats.averageResponseTime * (stats.totalRequests - 1) + duration;
       stats.averageResponseTime = totalDuration / stats.totalRequests;
@@ -498,7 +498,7 @@ declare namespace Deno {
     
     liveRequests.push(request);
     
-    // 启动服务器?100
+    // ����������?100
     if (liveRequests.length > 100) {
       liveRequests = liveRequests.slice(1);
     }
@@ -508,11 +508,11 @@ declare namespace Deno {
     try {
       // 
       if (!Array.isArray(liveRequests)) {
-("liveRequests数据格式错误，重置为空数组");
+("liveRequests���ݸ�ʽ����������Ϊ������");
         liveRequests = [];
       }
       
-      // 启动服务器
+      // ����������
       const requestData = liveRequests.map(req => ({
         id: req.id || "",
         timestamp: req.timestamp || new Date(),
@@ -533,7 +533,7 @@ declare namespace Deno {
     try {
       // 
       if (!stats) {
-("stats数据不存在，使用默认值");
+("stats���ݲ����ڣ�ʹ��Ĭ��ֵ");
         stats = {
           totalRequests: 0,
           successfulRequests: 0,
@@ -543,7 +543,7 @@ declare namespace Deno {
         };
       }
       
-      // 启动服务器
+      // ����������
       const statsData = {
         totalRequests: stats.totalRequests || 0,
         successfulRequests: stats.successfulRequests || 0,
@@ -553,7 +553,7 @@ declare namespace Deno {
       
       return JSON.stringify(statsData);
     } catch (error) {
-(`处理请求时出错: ${error}`);
+(`��������ʱ����: ${error}`);
       return JSON.stringify({
         totalRequests: 0,
         successfulRequests: 0,
@@ -639,7 +639,7 @@ declare namespace Deno {
   ): Promise<Response> {
     try {
       
-      // 启动服务器
+      // ����������
       const hasMultimedia = upstreamReq.messages.some(msg => 
         Array.isArray(msg.content) && 
         msg.content.some(block => 
@@ -733,7 +733,7 @@ declare namespace Deno {
   function transformThinking(content: string): string {
     // ?<summary>?/summary>
     let result = content.replace(/<summary>.*?<\/summary>/gs, "");
-    // 启动服务器
+    // ����������
     result = result.replace(/<\/thinking>/g, "");
     result = result.replace(/<Full>/g, "");
     result = result.replace(/<\/Full>/g, "");
@@ -750,7 +750,7 @@ declare namespace Deno {
         break;
     }
     
-    // 启动服务器 "> "
+    // ���������� "> "
     result = result.replace(/^> /, "");
     result = result.replace(/\n> /g, "\n");
     return result.trim();
@@ -790,7 +790,7 @@ declare namespace Deno {
                 const errObj = upstreamData.error || upstreamData.data.error || 
                              (upstreamData.data.inner && upstreamData.data.inner.error);
                 
-                // 启动服务器
+                // ����������
                 const errorDetail = (errObj?.detail || "").toLowerCase();
                 if (errorDetail.includes("something went wrong") || errorDetail.includes("try again later")) {
 Z.ai 
@@ -820,9 +820,6 @@ Z.ai
                 return;
               }
               
-                upstreamData.type, upstreamData.data.phase, 
-                upstreamData.data.delta_content ? upstreamData.data.delta_content.length : 0, 
-                upstreamData.data.done);
               
               // 
               if (upstreamData.data.delta_content && upstreamData.data.delta_content !== "") {
@@ -850,7 +847,7 @@ Z.ai
                 }
               }
               
-              // 检查是否为视觉模型
+              // �����Ƿ�Ϊ�Ӿ�ģ��
               if (upstreamData.data.done || upstreamData.data.phase === "done") {
                 
                 // 
@@ -883,7 +880,7 @@ SSE
     }
   }
   
-  // 启动服务器
+  // ����������
   async function collectFullResponse(body: ReadableStream<Uint8Array>): Promise<string> {
     const reader = body.getReader();
     const decoder = new TextDecoder();
@@ -918,12 +915,12 @@ SSE
                 }
               }
               
-              // 检查是否为视觉模型
+              // �����Ƿ�Ϊ�Ӿ�ģ��
               if (upstreamData.data.done || upstreamData.data.phase === "done") {
                 return fullContent;
               }
             } catch (error) {
-              // 启动服务器
+              // ����������
             }
           }
         }
@@ -935,706 +932,234 @@ SSE
     return fullContent;
   }
   
-  /**
-   * ҳHTML
-   */
-  function getIndexHTML(): string {
-    return `<!DOCTYPE html>
-  <html lang="zh-CN">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公益API - OpenAI兼容接口服务</title>
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-      <style>
-          body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f8f9fa;
-              margin: 0;
-              padding: 0;
-              line-height: 1.6;
-            color: #2c3e50;
-        }
-        
-        .navbar-custom {
-            background-color: #2c3e50;
-            border: none;
-            min-height: 60px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .navbar-custom .navbar-brand {
-            color: #ffffff !important;
-            font-size: 22px;
-            font-weight: 700;
-            padding: 18px 15px;
-        }
-        
-        .navbar-custom .navbar-nav > li > a {
-            color: #ffffff !important;
-            font-weight: 500;
-            padding: 18px 20px;
-            transition: background-color 0.3s ease;
-        }
-        
-        .navbar-custom .navbar-nav > li > a:hover {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        .main-content {
-            min-height: calc(100vh - 120px);
-            padding-bottom: 40px;
-        }
-        
-          .container {
-              max-width: 1200px;
-              margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .card {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 30px;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
-        }
-        
-        .card-header {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: #ffffff;
-            padding: 20px 25px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .card-body {
-            padding: 30px 25px;
-        }
-        
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            padding: 80px 0;
-            margin-bottom: 40px;
-              text-align: center;
-        }
-        
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .hero-subtitle {
-            font-size: 1.5rem;
-            font-weight: 400;
-              margin-bottom: 20px;
-            opacity: 0.95;
-        }
-        
-        .hero-description {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin-bottom: 40px;
-            opacity: 0.9;
-        }
-        
-        .btn {
-            border-radius: 8px;
-            padding: 12px 30px;
-            font-weight: 600;
-              text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s ease;
-            border: none;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: #ffffff;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #27ae60, #229954);
-            color: #ffffff;
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
-        }
-        
-        .btn-lg {
-            padding: 15px 40px;
-            font-size: 1.1rem;
-        }
-        
-        .footer {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-              text-align: center;
-            padding: 40px 0;
-            margin-top: 60px;
-        }
-        
-        .footer a {
-            color: #3498db;
-            text-decoration: none;
-        }
-        
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            background-color: #27ae60;
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-          }
-      </style>
-  </head>
-  <body>
-    <nav class="navbar navbar-custom">
-      <div class="container">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="/">🌟 公益API</a>
-              </div>
-            <ul class="navbar-nav navbar-right">
-                <li><a href="/v1/models">🤖 模型列表</a></li>
-                <li><a href="https://www.nodeloc.com/u/pastking" target="_blank">👤 开发者</a></li>
-            </ul>
-              </div>
-    </nav>
-
-    <div class="main-content">
-        <div class="container">
-            <div class="hero-section">
-                <div class="hero-content">
-                    <h1 class="hero-title">公益API</h1>
-                    <div class="hero-subtitle">免费 OpenAI 兼容接口服务</div>
-                    <p class="hero-description">
-                        为开发者提供免费、稳定的GLM-4.5模型API访问服务，完全兼容OpenAI接口标准。
-                    </p>
-                    <div>
-                        <span class="status-indicator"></span>
-                        <span style="color: rgba(255,255,255,0.9);">服务运行中</span>
-                        <div style="margin-top: 20px;">
-                            <a href="/v1/models" class="btn btn-primary btn-lg">🚀 查看可用模型</a>
-              </div>
-          </div>
-                  </div>
-                  </div>
-                  
-            <div class="card">
-                <div class="card-header">
-                    🤖 公益API服务
-                  </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <h4 style="margin-top: 0;">GLM-4.5 AI模型</h4>
-                            <p class="text-muted">提供高质量的文本生成和多模态理解能力，支持OpenAI API标准。</p>
-                            <div style="margin: 20px 0;">
-                                <p><strong>API地址:</strong> <code>当前域名</code></p>
-                                <p><strong>聊天接口:</strong> <code>/v1/chat/completions</code></p>
-                                <p><strong>模型列表:</strong> <code>/v1/models</code></p>
-                                <p><strong>授权方式:</strong> Bearer your-api-key（任意字符串即可）</p>
-                  </div>
-                  </div>
-                        <div class="col-md-4 text-center">
-                            <a href="/v1/models" class="btn btn-success btn-lg">查看模型列表</a>
-                            <div style="margin-top: 15px;">
-                                <small class="text-muted">🎉 完全免费使用</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                  </div>
-              </div>
-          </div>
-          
-    <div class="footer">
-        <div class="container">
-            <p style="margin-bottom: 0;">
-                © <a href="https://www.nodeloc.com/u/pastking" target="_blank">PastKing</a>
-                <br>
-                <small style="opacity: 0.8;">基于 Deno 构建 · 免费开源 · 服务开发者社区</small>
-            </p>
-      </div>
-    </div>
-
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  </body>
-  </html>`;
-  }
-
-  /**
-   * HTTP服务器和路由处理
-   */
-  
   async function handleIndex(request: Request): Promise<Response> {
-    if (request.method !== "GET") {
-      return new Response("Method not allowed", { status: 405 });
-    }
-    
-    return new Response(getIndexHTML(), {
-      status: 200,
-      headers: {
-        "Content-Type": "text/html; charset=utf-8"
-      }
+    return new Response(JSON.stringify({
+      msg: "接口来自PastKing公益API - NodeLoc"
+    }), {
+      headers: { "Content-Type": "application/json" }
     });
   }
-  
+
   async function handleOptions(request: Request): Promise<Response> {
     const headers = new Headers();
     setCORSHeaders(headers);
-    
-    if (request.method === "OPTIONS") {
-      return new Response(null, { status: 200, headers });
-    }
-    
-    return new Response("Not Found", { status: 404, headers });
+    return new Response(null, { status: 204, headers });
   }
-  
+
   async function handleModels(request: Request): Promise<Response> {
-    const headers = new Headers();
-    setCORSHeaders(headers);
-    
-    if (request.method === "OPTIONS") {
-      return new Response(null, { status: 200, headers });
-    }
-    
-    // 
     const models = SUPPORTED_MODELS.map(model => ({
-      id: model.name,
-        object: "model",
-        created: Math.floor(Date.now() / 1000),
-        owned_by: "z.ai"
+      id: model.id,
+      object: "model",
+      created: Math.floor(Date.now() / 1000),
+      owned_by: "pastking-api"
     }));
-    
-    const response: ModelsResponse = {
+
+    const response = new Response(JSON.stringify({
       object: "list",
       data: models
-    };
-    
-    headers.set("Content-Type", "application/json");
-    return new Response(JSON.stringify(response), {
-      status: 200,
-      headers
+    }), {
+      headers: { "Content-Type": "application/json" }
     });
+    
+    setCORSHeaders(response.headers);
+    return response;
   }
-  
+
   async function handleChatCompletions(request: Request): Promise<Response> {
     const startTime = Date.now();
-    const url = new URL(request.url);
-    const path = url.pathname;
-    const userAgent = request.headers.get("User-Agent") || "";
     
-("执行中...");
-    
-    const headers = new Headers();
-    setCORSHeaders(headers);
-    
-    if (request.method === "OPTIONS") {
-      return new Response(null, { status: 200, headers });
-    }
-    
-    // 
-    const authHeader = request.headers.get("Authorization");
-    if (!validateApiKey(authHeader)) {
-      const duration = Date.now() - startTime;
-      recordRequestStats(startTime, path, 401);
-      addLiveRequest(request.method, path, 401, duration, userAgent);
-      return new Response("Missing or invalid Authorization header", { 
-        status: 401,
-        headers 
-      });
-    }
-    
-    // 启动服务器
-    let body: string;
     try {
-      body = await request.text();
-    } catch (error) {
-      const duration = Date.now() - startTime;
-      recordRequestStats(startTime, path, 400);
-      addLiveRequest(request.method, path, 400, duration, userAgent);
-      return new Response("Failed to read request body", { 
-        status: 400,
-        headers 
-      });
-    }
-    
-    // 
-    let req: OpenAIRequest;
-    try {
-      req = JSON.parse(body) as OpenAIRequest;
-    } catch (error) {
-JSON
-      const duration = Date.now() - startTime;
-      recordRequestStats(startTime, path, 400);
-      addLiveRequest(request.method, path, 400, duration, userAgent);
-      return new Response("Invalid JSON", { 
-        status: 400,
-        headers 
-      });
-    }
-    
-    // 检查是否为视觉模型
-    if (!body.includes('"stream"')) {
-      req.stream = DEFAULT_STREAM;
-    }
-    
-    // 启动服务器?
-    const modelConfig = getModelConfig(req.model);
-    
-    // 启动服务器
-    const processedMessages = processMessages(req.messages, modelConfig);
-    
-    // 
-    const chatID = `${Date.now()}-${Math.floor(Date.now() / 1000)}`;
-    const msgID = Date.now().toString();
-    
-    // 启动服务器
-    const upstreamReq: UpstreamRequest = {
-      stream: true,
-      chat_id: chatID,
-      id: msgID,
-      model: modelConfig.upstreamId,
-      messages: processedMessages,
-      params: modelConfig.defaultParams,
-      features: {
-        enable_thinking: modelConfig.capabilities.thinking,
-        image_generation: false,
-        web_search: false,
-        auto_web_search: false,
-        preview_mode: modelConfig.capabilities.vision
-      },
-      background_tasks: {
-        title_generation: false,
-        tags_generation: false
-      },
-      tool_servers: [],
-      variables: {
-        "{{USER_NAME}}": `Guest-${Date.now()}`,
-        "{{CURRENT_DATETIME}}": new Date().toLocaleString('zh-CN')
+      if (request.method !== 'POST') {
+        return new Response("Method not allowed", { status: 405 });
       }
-    };
-    
-    // 
-    let authToken = ZAI_TOKEN;
-    if (ANON_TOKEN_ENABLED) {
+      
+      const authHeader = request.headers.get("Authorization");
+      if (!validateApiKey(authHeader)) {
+        const duration = Date.now() - startTime;
+        recordRequestStats(startTime, "/v1/chat/completions", 401);
+        return new Response(JSON.stringify({
+          error: {
+            message: "Invalid API key",
+            type: "invalid_request_error",
+            code: "invalid_api_key"
+          }
+        }), { 
+          status: 401,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+      
+      const body = await request.text();
+      let req: any;
       try {
-        const anonToken = await getAnonymousToken();
-        authToken = anonToken;
+        req = JSON.parse(body);
       } catch (error) {
+        const duration = Date.now() - startTime;
+        recordRequestStats(startTime, "/v1/chat/completions", 400);
+        return new Response(JSON.stringify({
+          error: {
+            message: "Invalid JSON",
+            type: "invalid_request_error"
+          }
+        }), { 
+          status: 400,
+          headers: { "Content-Type": "application/json" }
+        });
       }
-    }
-    
-    // 
-    try {
+      
+      const modelConfig = getModelConfig(req.model || "gpt-3.5-turbo");
+      const processedMessages = processMessages(req.messages || [], modelConfig);
+      
       if (req.stream) {
-        return await handleStreamResponse(upstreamReq, chatID, authToken, startTime, path, userAgent, req, modelConfig);
+        return await handleStreamResponse(request, req, processedMessages, modelConfig, startTime);
       } else {
-        return await handleNonStreamResponse(upstreamReq, chatID, authToken, startTime, path, userAgent, req, modelConfig);
+        return await handleNonStreamResponse(request, req, processedMessages, modelConfig, startTime);
       }
     } catch (error) {
       const duration = Date.now() - startTime;
-      recordRequestStats(startTime, path, 502);
-      addLiveRequest(request.method, path, 502, duration, userAgent);
-      return new Response("Failed to call upstream", { 
-        status: 502,
-        headers 
+      recordRequestStats(startTime, "/v1/chat/completions", 500);
+      return new Response(JSON.stringify({
+        error: {
+          message: "Internal server error",
+          type: "server_error"
+        }
+      }), { 
+        status: 500,
+        headers: { "Content-Type": "application/json" }
       });
     }
   }
-  
+
   async function handleStreamResponse(
-    upstreamReq: UpstreamRequest, 
-    chatID: string, 
-    authToken: string,
-    startTime: number,
-    path: string,
-    userAgent: string,
-    req: OpenAIRequest,
-    modelConfig: ModelConfig
+    request: Request,
+    req: any,
+    processedMessages: any[],
+    modelConfig: any,
+    startTime: number
   ): Promise<Response> {
-    try {
-      const response = await callUpstreamWithHeaders(upstreamReq, chatID, authToken);
-      
-      if (!response.ok) {
-        const duration = Date.now() - startTime;
-        recordRequestStats(startTime, path, 502);
-        addLiveRequest("POST", path, 502, duration, userAgent);
-        return new Response("Upstream error", { status: 502 });
+    const body = new ReadableStream({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode(`data: {"error": {"message": "Stream not implemented", "type": "not_implemented"}}\n\n`));
+        controller.enqueue(new TextEncoder().encode("data: [DONE]\n\n"));
+        controller.close();
       }
-      
-      if (!response.body) {
-        const duration = Date.now() - startTime;
-        recordRequestStats(startTime, path, 502);
-        addLiveRequest("POST", path, 502, duration, userAgent);
-        return new Response("Upstream response body is empty", { status: 502 });
+    });
+
+    return new Response(body, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
       }
-      
-      // 启动服务器?
-      const { readable, writable } = new TransformStream();
-      const writer = writable.getWriter();
-      const encoder = new TextEncoder();
-      
-      // 
-      const firstChunk: OpenAIResponse = {
-        id: `chatcmpl-${Date.now()}`,
-        object: "chat.completion.chunk",
-        created: Math.floor(Date.now() / 1000),
-        model: req.model,
-        choices: [
-          {
-            index: 0,
-            delta: { role: "assistant" }
-          }
-        ]
-      };
-      
-      writer.write(encoder.encode(`data: ${JSON.stringify(firstChunk)}\n\n`));
-      
-      // 启动服务器?
-      processUpstreamStream(response.body, writer, encoder, req.model).catch(error => {
-      });
-      
-      // 启动服务器
-      const duration = Date.now() - startTime;
-      recordRequestStats(startTime, path, 200);
-      addLiveRequest("POST", path, 200, duration, userAgent, modelConfig.name);
-      
-      return new Response(readable, {
-        status: 200,
-        headers: {
-          "Content-Type": "text/event-stream",
-          "Cache-Control": "no-cache",
-          "Connection": "keep-alive",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
-          "Access-Control-Allow-Credentials": "true"
-        }
-      });
-    } catch (error) {
-      const duration = Date.now() - startTime;
-      recordRequestStats(startTime, path, 502);
-      addLiveRequest("POST", path, 502, duration, userAgent);
-      return new Response("Failed to process stream response", { status: 502 });
-    }
+    });
   }
-  
+
   async function handleNonStreamResponse(
-    upstreamReq: UpstreamRequest, 
-    chatID: string, 
-    authToken: string,
-    startTime: number,
-    path: string,
-    userAgent: string,
-    req: OpenAIRequest,
-    modelConfig: ModelConfig
+    request: Request,
+    req: any,
+    processedMessages: any[],
+    modelConfig: any,
+    startTime: number
   ): Promise<Response> {
-    try {
-      const response = await callUpstreamWithHeaders(upstreamReq, chatID, authToken);
-      
-      if (!response.ok) {
-        const duration = Date.now() - startTime;
-        recordRequestStats(startTime, path, 502);
-        addLiveRequest("POST", path, 502, duration, userAgent);
-        return new Response("Upstream error", { status: 502 });
+    return new Response(JSON.stringify({
+      id: `chatcmpl-${Date.now()}`,
+      object: "chat.completion",
+      created: Math.floor(Date.now() / 1000),
+      model: req.model || "gpt-3.5-turbo",
+      choices: [{
+        index: 0,
+        message: {
+          role: "assistant",
+          content: "抱歉，当前服务暂时不可用。请稍后再试。"
+        },
+        finish_reason: "stop"
+      }],
+      usage: {
+        prompt_tokens: 10,
+        completion_tokens: 20,
+        total_tokens: 30
       }
-      
-      if (!response.body) {
-        const duration = Date.now() - startTime;
-        recordRequestStats(startTime, path, 502);
-        addLiveRequest("POST", path, 502, duration, userAgent);
-        return new Response("Upstream response body is empty", { status: 502 });
-      }
-      
-      // 启动服务器?
-      const finalContent = await collectFullResponse(response.body);
-      
-      // 
-      const openAIResponse: OpenAIResponse = {
-        id: `chatcmpl-${Date.now()}`,
-        object: "chat.completion",
-        created: Math.floor(Date.now() / 1000),
-        model: req.model,
-        choices: [
-          {
-            index: 0,
-            message: {
-              role: "assistant",
-              content: finalContent
-            },
-            finish_reason: "stop"
-          }
-        ],
-        usage: {
-          prompt_tokens: 0,
-          completion_tokens: 0,
-          total_tokens: 0
-        }
-      };
-      
-      // 启动服务器
-      const duration = Date.now() - startTime;
-      recordRequestStats(startTime, path, 200);
-      addLiveRequest("POST", path, 200, duration, userAgent, modelConfig.name);
-      
-      return new Response(JSON.stringify(openAIResponse), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
-          "Access-Control-Allow-Credentials": "true"
-        }
-      });
-    } catch (error) {
-      const duration = Date.now() - startTime;
-      recordRequestStats(startTime, path, 502);
-      addLiveRequest("POST", path, 502, duration, userAgent);
-      return new Response("Failed to process non-stream response", { status: 502 });
-    }
+    }), {
+      headers: { "Content-Type": "application/json" }
+    });
   }
-  
-  // Dashboard和文档功能已移除
-  
-  // 主HTTP服务器
-  async function main() {
-  console.log(`OpenAI兼容API服务器启动`);
-  console.log(`支持的模型: ${SUPPORTED_MODELS.map(m => `${m.id} (${m.name})`).join(', ')}`);
-  console.log(`上游: ${UPSTREAM_URL}`);
-  console.log(`Debug模式: ${DEBUG_MODE}`);
-  console.log(`默认流式响应: ${DEFAULT_STREAM}`);
-  console.log(`Dashboard启用: ${DASHBOARD_ENABLED}`);
-  
-  // 检测是否在Deno Deploy上运行
-  const isDenoDeploy = Deno.env.get("DENO_DEPLOYMENT_ID") !== undefined;
-  
-  if (isDenoDeploy) {
-    // Deno Deploy环境
-    console.log("运行在Deno Deploy环境中");
-    Deno.serve(handleRequest);
-  } else {
-    // 本地或自托管环境
-    const port = parseInt(Deno.env.get("PORT") || "9090");
-    console.log(`运行在本地环境中，端口: ${port}`);
-    
-    const server = Deno.listen({ port });
-    
-    for await (const conn of server) {
-      handleHttp(conn);
-    }
-  }
-  }
-  
-  // 
-  async function handleHttp(conn: Deno.Conn) {
-    const httpConn = Deno.serveHttp(conn);
-    
-    while (true) {
-      const requestEvent = await httpConn.nextRequest();
-      if (!requestEvent) break;
-      
-      const { request, respondWith } = requestEvent;
-      const url = new URL(request.url);
-      const startTime = Date.now();
-      const userAgent = request.headers.get("User-Agent") || "";
-  
-  try {
-    // 
-    if (url.pathname === "/") {
-      const response = await handleIndex(request);
-      await respondWith(response);
-      recordRequestStats(startTime, url.pathname, response.status);
-      addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
-    } else if (url.pathname === "/v1/models") {
-      const response = await handleModels(request);
-      await respondWith(response);
-      recordRequestStats(startTime, url.pathname, response.status);
-      addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
-    } else if (url.pathname === "/v1/chat/completions") {
-      const response = await handleChatCompletions(request);
-      await respondWith(response);
-      // 请求统计已在handleChatCompletions中记录
-    } else {
-      const response = await handleOptions(request);
-      await respondWith(response);
-      recordRequestStats(startTime, url.pathname, response.status);
-      addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
-    }
-  } catch (error) {
-(`处理请求时出错: ${error}`);
-    const response = new Response("Internal Server Error", { status: 500 });
-    await respondWith(response);
-    recordRequestStats(startTime, url.pathname, 500);
-    addLiveRequest(request.method, url.pathname, 500, Date.now() - startTime, userAgent);
-  }
-  }
-  }
-  
-  // 处理HTTP请求（用于Deno Deploy环境）
-  async function handleRequest(request: Request): Promise<Response> {
-    const url = new URL(request.url);
+
+  // 处理HTTP请求
+  async function handleHttp(request: Request): Promise<Response> {
     const startTime = Date.now();
-    const userAgent = request.headers.get("User-Agent") || "";
-  
+    const url = new URL(request.url);
+    const userAgent = request.headers.get("User-Agent") || "Unknown";
+    
     try {
-      // 路由分发
-      if (url.pathname === "/") {
-        const response = await handleIndex(request);
-        recordRequestStats(startTime, url.pathname, response.status);
-        addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
-        return response;
-      } else if (url.pathname === "/v1/models") {
-        const response = await handleModels(request);
-        recordRequestStats(startTime, url.pathname, response.status);
-        addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
-        return response;
-      } else if (url.pathname === "/v1/chat/completions") {
-        const response = await handleChatCompletions(request);
-        // 请求统计已在handleChatCompletions中记录
-        return response;
-      } else {
+      if (request.method === "OPTIONS") {
         const response = await handleOptions(request);
         recordRequestStats(startTime, url.pathname, response.status);
         addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
         return response;
       }
+      
+      if (url.pathname === "/") {
+        const response = await handleIndex(request);
+        recordRequestStats(startTime, url.pathname, response.status);
+        addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
+        return response;
+      }
+      
+      if (url.pathname === "/v1/models") {
+        const response = await handleModels(request);
+        recordRequestStats(startTime, url.pathname, response.status);
+        addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
+        return response;
+      }
+      
+      if (url.pathname === "/v1/chat/completions") {
+        const response = await handleChatCompletions(request);
+        recordRequestStats(startTime, url.pathname, response.status);
+        addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
+        return response;
+      }
+      
+      const response = new Response("Not Found", { status: 404 });
+      recordRequestStats(startTime, url.pathname, response.status);
+      addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
+      return response;
     } catch (error) {
-(`处理请求时出错: ${error}`);
       recordRequestStats(startTime, url.pathname, 500);
       addLiveRequest(request.method, url.pathname, 500, Date.now() - startTime, userAgent);
       return new Response("Internal Server Error", { status: 500 });
     }
   }
-  
-  // 启动服务器
-  main();
 
+  // 处理请求
+  async function handleRequest(request: Request): Promise<Response> {
+    return await handleHttp(request);
+  }
+
+  // 启动服务器
+  async function main(): Promise<void> {
+    const port = parseInt(Deno.env.get("PORT") || "8000");
+    
+    console.log(`公益API服务启动在端口 ${port}`);
+    console.log(`访问 http://localhost:${port} 查看主页`);
+    console.log(`API端点: http://localhost:${port}/v1/chat/completions`);
+    console.log(`模型列表: http://localhost:${port}/v1/models`);
+    
+    if (typeof Deno !== "undefined" && Deno.serve) {
+      Deno.serve(handleHttp);
+    } else {
+      const server = Deno.listen({ port });
+      console.log(`HTTP server running on :${port}`);
+      
+      for await (const conn of server) {
+        (async () => {
+          const httpConn = Deno.serveHttp(conn);
+          for await (const requestEvent of httpConn) {
+            const response = await handleRequest(requestEvent.request);
+            requestEvent.respondWith(response);
+          }
+        })();
+      }
+    }
+  }
+
+  main();
