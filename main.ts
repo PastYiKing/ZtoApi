@@ -41,8 +41,8 @@ declare namespace Deno {
   }
   
   /**
-   * ����ͳ����Ϣ�ӿ�
-   * ���ڸ���API���õĸ���ָ?
+   * ?????????????
+   * ???????API??????????
    */
   interface RequestStats {
     totalRequests: number;
@@ -53,8 +53,8 @@ declare namespace Deno {
   }
   
   /**
-   * ʵʱ������Ϣ�ӿ�
-   * ����Dashboard��ʾ�����API�����¼
+   * ????????????
+   * ????Dashboard????????API??????
    */
   interface LiveRequest {
     id: string;
@@ -68,8 +68,8 @@ declare namespace Deno {
   }
   
   /**
-   * OpenAI��������ṹ
-   * ��׼���������API�����ʽ
+   * OpenAI?????????
+   * ????????????API??????
    */
   interface OpenAIRequest {
     model: string;
@@ -80,8 +80,8 @@ declare namespace Deno {
   }
   
   /**
-   * ������Ϣ�ṹ
-   * ֧��ȫ��λ��ģ̬���ݣ��ı���ͼ����Ƶ����?
+   * ?????????
+   * ??????��?????????????????????????
    */
   interface Message {
     role: string;
@@ -96,8 +96,8 @@ declare namespace Deno {
   }
   
   /**
-   * ���η�������ṹ
-   * ��Z.ai�����͵������ʽ
+   * ???��????????
+   * ??Z.ai?????????????
    */
   interface UpstreamRequest {
     stream: boolean;
@@ -124,7 +124,7 @@ declare namespace Deno {
   }
   
   /**
-   * OpenAI������Ӧ�ṹ
+   * OpenAI?????????
    */
   interface OpenAIResponse {
     id: string;
@@ -154,7 +154,7 @@ declare namespace Deno {
   }
   
   /**
-   * ����SSE���ݽṹ
+   * ????SSE?????
    */
   interface UpstreamData {
     type: string;
@@ -189,13 +189,13 @@ declare namespace Deno {
   }
   
   /**
-   * ���ó�������
+   * ???��???????
    */
   
-  // ˼�����ݴ����? strip-ȥ��<details>��ǩ, think-תΪ<thinking>��ǩ, raw-����ԭ��
+  // 启动服务器??? strip-???<details>???, think-??<thinking>???, raw-???????
   const THINK_TAGS_MODE = "strip";
   
-  // αװǰ��ͷ��������ץ��������
+  // ��??????????????????????
   const X_FE_VERSION = "prod-fe-1.0.70";
   const BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0";
   const SEC_CH_UA = "\"Not;A=Brand\";v=\"99\", \"Microsoft Edge\";v=\"139\", \"Chromium\";v=\"139\"";
@@ -206,19 +206,19 @@ declare namespace Deno {
   const ANON_TOKEN_ENABLED = true;
   
   /**
-   * ������������
+   * ????????????
    */
   const UPSTREAM_URL = Deno.env.get("UPSTREAM_URL") || "https://chat.z.ai/api/chat/completions";
   const DEFAULT_KEY = Deno.env.get("DEFAULT_KEY") || "sk-your-key";
   const ZAI_TOKEN = Deno.env.get("ZAI_TOKEN") || "";
   
   /**
-   * ֧�ֵ�ģ����?
+   * ??????????
    */
   interface ModelConfig {
-    id: string;           // OpenAI API�е�ģ��ID
-    name: string;         // ��ʾ����
-    upstreamId: string;   // Z.ai���ε�ģ��ID
+    id: string;           // OpenAI API?��????ID
+    name: string;         // ???????
+    upstreamId: string;   // Z.ai???��????ID
     capabilities: {
       vision: boolean;
       mcp: boolean;
@@ -263,17 +263,17 @@ declare namespace Deno {
     }
   ];
   
-  // Ĭ��ģ��
+  // ??????
   const DEFAULT_MODEL = SUPPORTED_MODELS[0];
   
-  // ����ģ��ID��ȡ����
+  // ???????ID???????
   function getModelConfig(modelId: string): ModelConfig {
-    // ��׼��ģ��ID������Cherry Studio�ȿͻ��˵Ĵ�Сд����
+    // ????????ID??????Cherry Studio????????����????
     const normalizedModelId = normalizeModelId(modelId);
     const found = SUPPORTED_MODELS.find(m => m.id === normalizedModelId);
     
     if (!found) {
-      debugLog("?? δ�ҵ�ģ����? %s (��׼����: %s)��ʹ��Ĭ��ģ? %s", 
+      debugLog("?? ��????????? %s (???????: %s)?????????? %s", 
         modelId, normalizedModelId, DEFAULT_MODEL.name);
     }
     
@@ -281,28 +281,28 @@ declare namespace Deno {
   }
   
   /**
-   * ��׼��ģ��ID�������ͬ�ͻ��˵�������?
-   * Cherry Studio�ȿͻ��˿���ʹ�ò�ͬ�Ĵ�Сд��ʽ
+   * ????????ID?????????????????????
+   * Cherry Studio???????????��?????����???
    */
   function normalizeModelId(modelId: string): string {
     const normalized = modelId.toLowerCase().trim();
     
-    // ���������ģ��IDӳ��
+    // 启动服务器???ID???
     const modelMappings: Record<string, string> = {
       'glm-4.5v': 'glm-4.5v',
       'glm4.5v': 'glm-4.5v',
       'glm_4.5v': 'glm-4.5v',
-      'gpt-4-vision-preview': 'glm-4.5v',  // ������
+      'gpt-4-vision-preview': 'glm-4.5v',  // ??????
       '0727-360b-api': '0727-360B-API',
       'glm-4.5': '0727-360B-API',
       'glm4.5': '0727-360B-API',
       'glm_4.5': '0727-360B-API',
-      'gpt-4': '0727-360B-API'  // ������
+      'gpt-4': '0727-360B-API'  // ??????
     };
     
     const mapped = modelMappings[normalized];
     if (mapped) {
-      debugLog("?? ģ��IDӳ��: %s ?%s", modelId, mapped);
+      debugLog("?? ???ID???: %s ?%s", modelId, mapped);
       return mapped;
     }
     
@@ -310,8 +310,8 @@ declare namespace Deno {
   }
   
   /**
-   * �������֤ȫ��λ��ģ̬��?
-   * ֧��ͼ����Ƶ���ĵ�����Ƶ�ȶ���ý������
+   * ???????????��???????
+   * ????????????????????????y??????
    */
   function processMessages(messages: Message[], modelConfig: ModelConfig): Message[] {
     const processedMessages: Message[] = [];
@@ -319,11 +319,11 @@ declare namespace Deno {
     for (const message of messages) {
       const processedMessage: Message = { ...message };
       
-      // ����Ƿ�Ϊ��ģ̬��?
+      // 启动服务器?????
       if (Array.isArray(message.content)) {
-        debugLog("��⵽��ģ̬��Ϣ�����ݿ���? %d", message.content.length);
+        debugLog("???????????????????? %d", message.content.length);
         
-        // ͳ�Ƹ���ý������
+        // ??????y??????
         const mediaStats = {
           text: 0,
           images: 0,
@@ -333,23 +333,23 @@ declare namespace Deno {
           others: 0
         };
         
-        // ��֤ģ���Ƿ�֧�ֶ�ģ̬
+        // 启动服务器??????
         if (!modelConfig.capabilities.vision) {
-          debugLog("����: ģ�� %s ��֧�ֶ�ģ̬�����յ��˶�ģ̬��Ϣ", modelConfig.name);
-          // ֻ�����ı�����
+          debugLog("????: ??? %s ???????????????????????", modelConfig.name);
+          // 启动服务器???
           const textContent = message.content
             .filter(block => block.type === 'text')
             .map(block => block.text)
             .join('\n');
           processedMessage.content = textContent;
         } else {
-          // GLM-4.5V ֧��ȫ��λ��ģ̬����������������?
+          // GLM-4.5V ??????��?????????????????????
           for (const block of message.content) {
             switch (block.type) {
               case 'text':
                 if (block.text) {
                   mediaStats.text++;
-                  debugLog("?? �ı����ݣ���? %d", block.text.length);
+                  debugLog("?? ??????????? %d", block.text.length);
                 }
                 break;
                 
@@ -360,11 +360,11 @@ declare namespace Deno {
                   if (url.startsWith('data:image/')) {
                     const mimeMatch = url.match(/data:image\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog("???ͼ������: %s��ʽ, ��С: %d�ַ�", format, url.length);
+                    debugLog("??????????: %s???, ??��: %d???", format, url.length);
                   } else if (url.startsWith('http')) {
-                    debugLog("?? ͼ��URL: %s", url);
+                    debugLog("?? ???URL: %s", url);
                   } else {
-                    debugLog("?? δ֪ͼ���ʽ: %s", url.substring(0, 50));
+                    debugLog("?? ��??????: %s", url.substring(0, 50));
                   }
                 }
                 break;
@@ -376,11 +376,11 @@ declare namespace Deno {
                   if (url.startsWith('data:video/')) {
                     const mimeMatch = url.match(/data:video\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog("?? ��Ƶ����: %s��ʽ, ��С: %d�ַ�", format, url.length);
+                    debugLog("?? ???????: %s???, ??��: %d???", format, url.length);
                   } else if (url.startsWith('http')) {
-                    debugLog("?? ��ƵURL: %s", url);
+                    debugLog("?? ???URL: %s", url);
                   } else {
-                    debugLog("?? δ֪��Ƶ��ʽ: %s", url.substring(0, 50));
+                    debugLog("?? ��???????: %s", url.substring(0, 50));
                   }
                 }
                 break;
@@ -392,11 +392,11 @@ declare namespace Deno {
                   if (url.startsWith('data:application/')) {
                     const mimeMatch = url.match(/data:application\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog("?? �ĵ�����: %s��ʽ, ��С: %d�ַ�", format, url.length);
+                    debugLog("?? ???????: %s???, ??��: %d???", format, url.length);
                   } else if (url.startsWith('http')) {
-                    debugLog("?? �ĵ�URL: %s", url);
+                    debugLog("?? ???URL: %s", url);
                   } else {
-                    debugLog("?? δ֪�ĵ���ʽ: %s", url.substring(0, 50));
+                    debugLog("?? ��???????: %s", url.substring(0, 50));
                   }
                 }
                 break;
@@ -408,30 +408,30 @@ declare namespace Deno {
                   if (url.startsWith('data:audio/')) {
                     const mimeMatch = url.match(/data:audio\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog("?? ��Ƶ����: %s��ʽ, ��С: %d�ַ�", format, url.length);
+                    debugLog("?? ???????: %s???, ??��: %d???", format, url.length);
                   } else if (url.startsWith('http')) {
-                    debugLog("?? ��ƵURL: %s", url);
+                    debugLog("?? ???URL: %s", url);
                   } else {
-                    debugLog("?? δ֪��Ƶ��ʽ: %s", url.substring(0, 50));
+                    debugLog("?? ��???????: %s", url.substring(0, 50));
                   }
                 }
                 break;
                 
               default:
                 mediaStats.others++;
-                debugLog("?δ֪��������: %s", block.type);
+                debugLog("?��?????????: %s", block.type);
             }
           }
           
-          // ���ͳ����Ϣ
+          // 启动服务器
           const totalMedia = mediaStats.images + mediaStats.videos + mediaStats.documents + mediaStats.audios;
           if (totalMedia > 0) {
-            debugLog("?? ��ģ̬����ͳ? �ı�(%d) ͼ��(%d) ��Ƶ(%d) �ĵ�(%d) ��Ƶ(%d)", 
+            debugLog("?? ?????????? ???(%d) ???(%d) ???(%d) ???(%d) ???(%d)", 
               mediaStats.text, mediaStats.images, mediaStats.videos, mediaStats.documents, mediaStats.audios);
           }
         }
       } else if (typeof message.content === 'string') {
-        debugLog("?? ���ı���Ϣ������: %d", message.content.length);
+        debugLog("?? ??????????????: %d", message.content.length);
       }
       
       processedMessages.push(processedMessage);
@@ -440,12 +440,12 @@ declare namespace Deno {
     return processedMessages;
   }
   
-  const DEBUG_MODE = Deno.env.get("DEBUG_MODE") !== "false"; // Ĭ��Ϊtrue
-  const DEFAULT_STREAM = Deno.env.get("DEFAULT_STREAM") !== "false"; // Ĭ��Ϊtrue
-  const DASHBOARD_ENABLED = Deno.env.get("DASHBOARD_ENABLED") !== "false"; // Ĭ��Ϊtrue
+  const DEBUG_MODE = Deno.env.get("DEBUG_MODE") !== "false"; // ????true
+  const DEFAULT_STREAM = Deno.env.get("DEFAULT_STREAM") !== "false"; // ????true
+  const DASHBOARD_ENABLED = Deno.env.get("DASHBOARD_ENABLED") !== "false"; // ????true
   
   /**
-   * ȫ��״̬��?
+   * ????????
    */
   
   let stats: RequestStats = {
@@ -459,7 +459,7 @@ declare namespace Deno {
   let liveRequests: LiveRequest[] = [];
   
   /**
-   * ���ߺ���
+   * ???????
    */
   
   function debugLog(format: string, ...args: unknown[]): void {
@@ -480,7 +480,7 @@ declare namespace Deno {
       stats.failedRequests++;
     }
     
-    // ����ƽ����Ӧʱ��
+    // 启动服务器????
     if (stats.totalRequests > 0) {
       const totalDuration = stats.averageResponseTime * (stats.totalRequests - 1) + duration;
       stats.averageResponseTime = totalDuration / stats.totalRequests;
@@ -503,7 +503,7 @@ declare namespace Deno {
     
     liveRequests.push(request);
     
-    // ֻ���������100����?
+    // 启动服务器?100?????
     if (liveRequests.length > 100) {
       liveRequests = liveRequests.slice(1);
     }
@@ -511,13 +511,13 @@ declare namespace Deno {
   
   function getLiveRequestsData(): string {
     try {
-      // ȷ��liveRequests������
+      // ???liveRequests??????
       if (!Array.isArray(liveRequests)) {
-        debugLog("liveRequests�������飬����Ϊ������");
+        debugLog("liveRequests???????��???????????");
         liveRequests = [];
       }
       
-      // ȷ�����ص����ݸ�ʽ��ǰ��������һ��
+      // 启动服务器???????????????????
       const requestData = liveRequests.map(req => ({
         id: req.id || "",
         timestamp: req.timestamp || new Date(),
@@ -530,16 +530,16 @@ declare namespace Deno {
       
       return JSON.stringify(requestData);
     } catch (error) {
-      debugLog("��ȡʵʱ��������ʧ��: %v", error);
+      debugLog("????????????????: %v", error);
       return JSON.stringify([]);
     }
   }
   
   function getStatsData(): string {
     try {
-      // ȷ��stats�������
+      // ???stats???????
       if (!stats) {
-        debugLog("stats���󲻴��ڣ�ʹ��Ĭ��ֵ");
+        debugLog("stats????????????????");
         stats = {
           totalRequests: 0,
           successfulRequests: 0,
@@ -549,7 +549,7 @@ declare namespace Deno {
         };
       }
       
-      // ȷ�����ص����ݸ�ʽ��ǰ��������һ?
+      // 启动服务器??????????????????
       const statsData = {
         totalRequests: stats.totalRequests || 0,
         successfulRequests: stats.successfulRequests || 0,
@@ -559,7 +559,7 @@ declare namespace Deno {
       
       return JSON.stringify(statsData);
     } catch (error) {
-      debugLog("��ȡͳ������ʧ��: %v", error);
+      debugLog("处理请求时出错: %v", error);
       return JSON.stringify({
         totalRequests: 0,
         successfulRequests: 0,
@@ -570,7 +570,7 @@ declare namespace Deno {
   }
   
   function getClientIP(request: Request): string {
-    // ���X-Forwarded-For?
+    // ???X-Forwarded-For?
     const xff = request.headers.get("X-Forwarded-For");
     if (xff) {
       const ips = xff.split(",");
@@ -579,13 +579,13 @@ declare namespace Deno {
       }
     }
     
-    // ���X-Real-IP?
+    // ???X-Real-IP?
     const xri = request.headers.get("X-Real-IP");
     if (xri) {
       return xri;
     }
     
-    // ����Deno Deploy�������޷�ֱ�ӻ�ȡRemoteAddr������һ��Ĭ?
+    // ????Deno Deploy??????????????RemoteAddr???????????
     return "unknown";
   }
   
@@ -633,21 +633,21 @@ declare namespace Deno {
       
       return data.token;
     } catch (error) {
-      debugLog("��ȡ����tokenʧ��: %v", error);
+      debugLog("???????token???: %v", error);
       throw error;
     }
   }
   
-  // ��������API
+  // ????????API
   async function callUpstreamWithHeaders(
     upstreamReq: UpstreamRequest, 
     refererChatID: string, 
     authToken: string
   ): Promise<Response> {
     try {
-      debugLog("��������API: %s", UPSTREAM_URL);
+      debugLog("????????API: %s", UPSTREAM_URL);
       
-      // �ر���ͼ�¼ȫ��λ��ģ̬��?
+      // 启动服务器??��???????
       const hasMultimedia = upstreamReq.messages.some(msg => 
         Array.isArray(msg.content) && 
         msg.content.some(block => 
@@ -656,7 +656,7 @@ declare namespace Deno {
       );
       
       if (hasMultimedia) {
-        debugLog("?? ���������ģ̬���ݣ����ڷ��͵�����...");
+        debugLog("?? ????????????????????????????...");
         
         for (let i = 0; i < upstreamReq.messages.length; i++) {
           const msg = upstreamReq.messages[i];
@@ -664,64 +664,64 @@ declare namespace Deno {
             for (let j = 0; j < msg.content.length; j++) {
               const block = msg.content[j];
               
-              // ����ͼ��
+              // ???????
               if (block.type === 'image_url' && block.image_url?.url) {
                 const url = block.image_url.url;
                 if (url.startsWith('data:image/')) {
                   const mimeMatch = url.match(/data:image\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  const sizeKB = Math.round(url.length * 0.75 / 1024); // base64 ��Լ��ԭ�ļ�?1.33 ?
-                  debugLog("???��Ϣ[%d] ͼ��[%d]: %s��ʽ, ���ݳ���: %d�ַ� (~%dKB)", 
+                  const sizeKB = Math.round(url.length * 0.75 / 1024); // base64 ??????????1.33 ?
+                  debugLog("??????[%d] ???[%d]: %s???, ???????: %d??? (~%dKB)", 
                     i, j, format, url.length, sizeKB);
                   
-                  // ͼƬ��С����
+                  // ????��????
                   if (sizeKB > 1000) {
-                    debugLog("??  ͼƬ�ϴ� (%dKB)�����ܵ������δ���ʧ��", sizeKB);
-                    debugLog("?? ����: ��ͼƬѹ���� 500KB ����");
+                    debugLog("??  ????? (%dKB)????????????��??????", sizeKB);
+                    debugLog("?? ????: ????????? 500KB ????");
                   } else if (sizeKB > 500) {
-                    debugLog("??  ͼƬƫ�� (%dKB)������ѹ��", sizeKB);
+                    debugLog("??  ????? (%dKB)?????????", sizeKB);
                   }
                 } else {
-                  debugLog("?? ��Ϣ[%d] ͼ��[%d]: �ⲿURL - %s", i, j, url);
+                  debugLog("?? ???[%d] ???[%d]: ??URL - %s", i, j, url);
                 }
               }
               
-              // ������Ƶ
+              // ???????
               if (block.type === 'video_url' && block.video_url?.url) {
                 const url = block.video_url.url;
                 if (url.startsWith('data:video/')) {
                   const mimeMatch = url.match(/data:video\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
+                  debugLog("?? ???[%d] ???[%d]: %s???, ???????: %d???", 
                     i, j, format, url.length);
                 } else {
-                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: �ⲿURL - %s", i, j, url);
+                  debugLog("?? ???[%d] ???[%d]: ??URL - %s", i, j, url);
                 }
               }
               
-              // �����ĵ�
+              // ???????
               if (block.type === 'document_url' && block.document_url?.url) {
                 const url = block.document_url.url;
                 if (url.startsWith('data:application/')) {
                   const mimeMatch = url.match(/data:application\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog("?? ��Ϣ[%d] �ĵ�[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
+                  debugLog("?? ???[%d] ???[%d]: %s???, ???????: %d???", 
                     i, j, format, url.length);
                 } else {
-                  debugLog("?? ��Ϣ[%d] �ĵ�[%d]: �ⲿURL - %s", i, j, url);
+                  debugLog("?? ???[%d] ???[%d]: ??URL - %s", i, j, url);
                 }
               }
               
-              // ������Ƶ
+              // ???????
               if (block.type === 'audio_url' && block.audio_url?.url) {
                 const url = block.audio_url.url;
                 if (url.startsWith('data:audio/')) {
                   const mimeMatch = url.match(/data:audio\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
+                  debugLog("?? ???[%d] ???[%d]: %s???, ???????: %d???", 
                     i, j, format, url.length);
                 } else {
-                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: �ⲿURL - %s", i, j, url);
+                  debugLog("?? ???[%d] ???[%d]: ??URL - %s", i, j, url);
                 }
               }
             }
@@ -729,7 +729,7 @@ declare namespace Deno {
         }
       }
       
-      debugLog("��������? %s", JSON.stringify(upstreamReq));
+      debugLog("????????? %s", JSON.stringify(upstreamReq));
       
       const response = await fetch(UPSTREAM_URL, {
         method: "POST",
@@ -749,10 +749,10 @@ declare namespace Deno {
         body: JSON.stringify(upstreamReq)
       });
       
-      debugLog("������Ӧ? %d %s", response.status, response.statusText);
+      debugLog("???????? %d %s", response.status, response.statusText);
       return response;
     } catch (error) {
-      debugLog("��������ʧ��: %v", error);
+      debugLog("???????????: %v", error);
       throw error;
     }
   }
@@ -760,7 +760,7 @@ declare namespace Deno {
   function transformThinking(content: string): string {
     // ?<summary>?/summary>
     let result = content.replace(/<summary>.*?<\/summary>/gs, "");
-    // ��������Զ����ǩ��?</thinking>?Full> ?
+    // 启动服务器????????</thinking>?Full> ?
     result = result.replace(/<\/thinking>/g, "");
     result = result.replace(/<Full>/g, "");
     result = result.replace(/<\/Full>/g, "");
@@ -777,7 +777,7 @@ declare namespace Deno {
         break;
     }
     
-    // ����ÿ��ǰ׺ "> "��������ʼλ�ã�
+    // 启动服务器 "> "?????????��???
     result = result.replace(/^> /, "");
     result = result.replace(/\n> /g, "\n");
     return result.trim();
@@ -800,39 +800,39 @@ declare namespace Deno {
         
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        buffer = lines.pop() || ""; // �������һ������������
+        buffer = lines.pop() || ""; // ????????????????????
         
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             const dataStr = line.substring(6);
             if (dataStr === "") continue;
             
-            debugLog("�յ�SSE����: %s", dataStr);
+            debugLog("???SSE????: %s", dataStr);
             
             try {
               const upstreamData = JSON.parse(dataStr) as UpstreamData;
               
-              // �����?
+              // ??????
               if (upstreamData.error || upstreamData.data.error || 
                   (upstreamData.data.inner && upstreamData.data.inner.error)) {
                 const errObj = upstreamData.error || upstreamData.data.error || 
                              (upstreamData.data.inner && upstreamData.data.inner.error);
-                debugLog("���δ���: code=%d, detail=%s", errObj?.code, errObj?.detail);
+                debugLog("???��???: code=%d, detail=%s", errObj?.code, errObj?.detail);
                 
-                // �����������ͣ��ر��Ƕ�ģ̬��ش���
+                // 启动服务器??????????????????
                 const errorDetail = (errObj?.detail || "").toLowerCase();
                 if (errorDetail.includes("something went wrong") || errorDetail.includes("try again later")) {
-                  debugLog("?? Z.ai �������������");
-                  debugLog("   ?? ��������: %s", errObj?.detail);
-                  debugLog("   ??? ����ԭ��: ͼƬ����ʧ��");
-                  debugLog("   ?? ����������:");
-                  debugLog("      1. ʹ�ø�С��ͼƬ(< 500KB)");
-                  debugLog("      2. ���Բ�ͬ��ͼƬ��ʽ(JPEG ������PNG)");
-                  debugLog("      3. �Ժ����� (�����Ƿ�������������)");
-                  debugLog("      4. ���ͼƬ�Ƿ���");
+                  debugLog("?? Z.ai ?????????????");
+                  debugLog("   ?? ????????: %s", errObj?.detail);
+                  debugLog("   ??? ???????: ?????????");
+                  debugLog("   ?? ??????????:");
+                  debugLog("      1. ????��????(< 500KB)");
+                  debugLog("      2. ?????????????(JPEG ??????PNG)");
+                  debugLog("      3. ??????? (???????????????????)");
+                  debugLog("      4. ??????????");
                 }
                 
-                // ���ͽ���chunk
+                // ???????chunk
                 const endChunk: OpenAIResponse = {
                   id: `chatcmpl-${Date.now()}`,
                   object: "chat.completion.chunk",
@@ -852,12 +852,12 @@ declare namespace Deno {
                 return;
               }
               
-              debugLog("�����ɹ� - ����: %s, �׶�: %s, ���ݳ���: %d, ���: %v",
+              debugLog("??????? - ????: %s, ???: %s, ???????: %d, ???: %v",
                 upstreamData.type, upstreamData.data.phase, 
                 upstreamData.data.delta_content ? upstreamData.data.delta_content.length : 0, 
                 upstreamData.data.done);
               
-              // ��������
+              // ????????
               if (upstreamData.data.delta_content && upstreamData.data.delta_content !== "") {
                 let out = upstreamData.data.delta_content;
                 if (upstreamData.data.phase === "thinking") {
@@ -865,7 +865,7 @@ declare namespace Deno {
                 }
                 
                 if (out !== "") {
-                  debugLog("������?%s): %s", upstreamData.data.phase, out);
+                  debugLog("???????%s): %s", upstreamData.data.phase, out);
                   
                   const chunk: OpenAIResponse = {
                     id: `chatcmpl-${Date.now()}`,
@@ -884,11 +884,11 @@ declare namespace Deno {
                 }
               }
               
-              // ����Ƿ����
+              // 启动服务器
               if (upstreamData.data.done || upstreamData.data.phase === "done") {
-                debugLog("��⵽�������ź�");
+                debugLog("????????????");
                 
-                // ���ͽ���chunk
+                // ???????chunk
                 const endChunk: OpenAIResponse = {
                   id: `chatcmpl-${Date.now()}`,
                   object: "chat.completion.chunk",
@@ -908,7 +908,7 @@ declare namespace Deno {
                 return;
               }
             } catch (error) {
-              debugLog("SSE���ݽ���ʧ��: %v", error);
+              debugLog("SSE??????????: %v", error);
             }
           }
         }
@@ -918,7 +918,7 @@ declare namespace Deno {
     }
   }
   
-  // �ռ�������Ӧ�����ڷ���ʽ��Ӧ?
+  // 启动服务器???????????????
   async function collectFullResponse(body: ReadableStream<Uint8Array>): Promise<string> {
     const reader = body.getReader();
     const decoder = new TextDecoder();
@@ -932,7 +932,7 @@ declare namespace Deno {
         
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        buffer = lines.pop() || ""; // �������һ������������
+        buffer = lines.pop() || ""; // ????????????????????
         
         for (const line of lines) {
           if (line.startsWith("data: ")) {
@@ -953,13 +953,13 @@ declare namespace Deno {
                 }
               }
               
-              // ����Ƿ����
+              // 启动服务器
               if (upstreamData.data.done || upstreamData.data.phase === "done") {
-                debugLog("��⵽����źţ�ֹͣ�ռ�");
+                debugLog("???????????????");
                 return fullContent;
               }
             } catch (error) {
-              // ���Խ�������
+              // 启动服务器??
             }
           }
         }
@@ -972,7 +972,7 @@ declare namespace Deno {
   }
   
   /**
-   * 生成首页HTML
+   * ������ҳHTML
    */
   function getIndexHTML(): string {
     return `<!DOCTYPE html>
@@ -980,7 +980,7 @@ declare namespace Deno {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公益API - OpenAI兼容接口服务</title>
+    <title>����API - OpenAI���ݽӿڷ���</title>
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1153,11 +1153,11 @@ declare namespace Deno {
     <nav class="navbar navbar-custom">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="/">🌟 公益API</a>
+                <a class="navbar-brand" href="/">?? ����API</a>
             </div>
             <ul class="navbar-nav navbar-right">
-                <li><a href="/v1/models">🤖 模型列表</a></li>
-                <li><a href="https://www.nodeloc.com/u/pastking" target="_blank">👤 开发者</a></li>
+                <li><a href="/v1/models">?? ģ���б�</a></li>
+                <li><a href="https://www.nodeloc.com/u/pastking" target="_blank">?? ������</a></li>
             </ul>
         </div>
     </nav>
@@ -1166,16 +1166,16 @@ declare namespace Deno {
         <div class="container">
             <div class="hero-section">
                 <div class="hero-content">
-                    <h1 class="hero-title">公益API</h1>
-                    <div class="hero-subtitle">免费 OpenAI 兼容接口服务</div>
+                    <h1 class="hero-title">����API</h1>
+                    <div class="hero-subtitle">���� OpenAI ���ݽӿڷ���</div>
                     <p class="hero-description">
-                        为开发者提供免费、稳定的GLM-4.5模型API访问服务，完全兼容OpenAI接口标准。
+                        Ϊ�������ṩ���ѡ��ȶ���GLM-4.5ģ��API���ʷ�������ȫ����OpenAI�ӿڱ�׼��
                     </p>
                     <div>
                         <span class="status-indicator"></span>
-                        <span style="color: rgba(255,255,255,0.9);">服务运行中</span>
+                        <span style="color: rgba(255,255,255,0.9);">����������</span>
                         <div style="margin-top: 20px;">
-                            <a href="/v1/models" class="btn btn-primary btn-lg">🚀 查看可用模型</a>
+                            <a href="/v1/models" class="btn btn-primary btn-lg">?? �鿴����ģ��</a>
                         </div>
                     </div>
                 </div>
@@ -1183,24 +1183,24 @@ declare namespace Deno {
             
             <div class="card">
                 <div class="card-header">
-                    🤖 公益API服务
+                    ?? ����API����
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-8">
-                            <h4 style="margin-top: 0;">GLM-4.5 AI模型</h4>
-                            <p class="text-muted">提供高质量的文本生成和多模态理解能力，支持OpenAI API标准。</p>
+                            <h4 style="margin-top: 0;">GLM-4.5 AIģ��</h4>
+                            <p class="text-muted">�ṩ���������ı����ɺͶ�ģ̬����������֧��OpenAI API��׼��</p>
                             <div style="margin: 20px 0;">
-                                <p><strong>API地址:</strong> <code>当前域名</code></p>
-                                <p><strong>聊天接口:</strong> <code>/v1/chat/completions</code></p>
-                                <p><strong>模型列表:</strong> <code>/v1/models</code></p>
-                                <p><strong>授权方式:</strong> Bearer your-api-key（任意字符串即可）</p>
+                                <p><strong>API��ַ:</strong> <code>��ǰ����</code></p>
+                                <p><strong>�����ӿ�:</strong> <code>/v1/chat/completions</code></p>
+                                <p><strong>ģ���б�:</strong> <code>/v1/models</code></p>
+                                <p><strong>��Ȩ��ʽ:</strong> Bearer your-api-key�������ַ������ɣ�</p>
                             </div>
                         </div>
                         <div class="col-md-4 text-center">
-                            <a href="/v1/models" class="btn btn-success btn-lg">查看模型列表</a>
+                            <a href="/v1/models" class="btn btn-success btn-lg">�鿴ģ���б�</a>
                             <div style="margin-top: 15px;">
-                                <small class="text-muted">🎉 完全免费使用</small>
+                                <small class="text-muted">?? ��ȫ����ʹ��</small>
                             </div>
                         </div>
                     </div>
@@ -1212,9 +1212,9 @@ declare namespace Deno {
     <div class="footer">
         <div class="container">
             <p style="margin-bottom: 0;">
-                © <a href="https://www.nodeloc.com/u/pastking" target="_blank">PastKing</a>
+                ? <a href="https://www.nodeloc.com/u/pastking" target="_blank">PastKing</a>
                 <br>
-                <small style="opacity: 0.8;">基于 Deno 构建 · 免费开源 · 服务开发者社区</small>
+                <small style="opacity: 0.8;">���� Deno ���� �� ���ѿ�Դ �� ���񿪷�������</small>
             </p>
         </div>
     </div>
@@ -1226,944 +1226,7 @@ declare namespace Deno {
   }
 
   /**
-   * HTTP服务器和路由处理
-   */
-  
-  function getLiveRequestsData(): string {
-    try {
-      // ȷ��liveRequests������
-      if (!Array.isArray(liveRequests)) {
-        debugLog("liveRequests�������飬����Ϊ������");
-        liveRequests = [];
-      }
-      
-      // ȷ�����ص����ݸ�ʽ��ǰ��������һ��
-      const requestData = liveRequests.map(req => ({
-        id: req.id || "",
-        timestamp: req.timestamp || new Date(),
-        method: req.method || "",
-        path: req.path || "",
-        status: req.status || 0,
-        duration: req.duration || 0,
-        user_agent: req.userAgent || ""
-      }));
-      
-      return JSON.stringify(requestData);
-    } catch (error) {
-      debugLog("��ȡʵʱ��������ʧ��: %v", error);
-      return JSON.stringify([]);
-    }
-  }
-  
-  function getStatsData(): string {
-    try {
-      // ȷ��stats�������
-      if (!stats) {
-        debugLog("stats���󲻴��ڣ�ʹ��Ĭ��ֵ");
-        stats = {
-          totalRequests: 0,
-          successfulRequests: 0,
-          failedRequests: 0,
-          lastRequestTime: new Date(),
-          averageResponseTime: 0
-        };
-      }
-      
-      // ȷ�����ص����ݸ�ʽ��ǰ��������һ?
-      const statsData = {
-        totalRequests: stats.totalRequests || 0,
-        successfulRequests: stats.successfulRequests || 0,
-        failedRequests: stats.failedRequests || 0,
-        averageResponseTime: stats.averageResponseTime || 0
-      };
-      
-      return JSON.stringify(statsData);
-    } catch (error) {
-      debugLog("��ȡͳ������ʧ��: %v", error);
-      return JSON.stringify({
-        totalRequests: 0,
-        successfulRequests: 0,
-        failedRequests: 0,
-        averageResponseTime: 0
-      });
-    }
-  }
-  
-  function getClientIP(request: Request): string {
-    // ���X-Forwarded-For?
-    const xff = request.headers.get("X-Forwarded-For");
-    if (xff) {
-      const ips = xff.split(",");
-      if (ips.length > 0) {
-        return ips[0].trim();
-      }
-    }
-    
-    // ���X-Real-IP?
-    const xri = request.headers.get("X-Real-IP");
-    if (xri) {
-      return xri;
-    }
-    
-    // ����Deno Deploy�������޷�ֱ�ӻ�ȡRemoteAddr������һ��Ĭ?
-    return "unknown";
-  }
-  
-  function setCORSHeaders(headers: Headers): void {
-    headers.set("Access-Control-Allow-Origin", "*");
-    headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    headers.set("Access-Control-Allow-Credentials", "true");
-  }
-  
-  function validateApiKey(authHeader: string | null): boolean {
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return false;
-    }
-    
-    const apiKey = authHeader.substring(7);
-    return apiKey === DEFAULT_KEY;
-  }
-  
-  async function getAnonymousToken(): Promise<string> {
-    try {
-      const response = await fetch(`${ORIGIN_BASE}/api/v1/auths/`, {
-        method: "GET",
-        headers: {
-          "User-Agent": BROWSER_UA,
-          "Accept": "*/*",
-          "Accept-Language": "zh-CN,zh;q=0.9",
-          "X-FE-Version": X_FE_VERSION,
-          "sec-ch-ua": SEC_CH_UA,
-          "sec-ch-ua-mobile": SEC_CH_UA_MOB,
-          "sec-ch-ua-platform": SEC_CH_UA_PLAT,
-          "Origin": ORIGIN_BASE,
-          "Referer": `${ORIGIN_BASE}/`
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Anonymous token request failed with status ${response.status}`);
-      }
-      
-      const data = await response.json() as { token: string };
-      if (!data.token) {
-        throw new Error("Anonymous token is empty");
-      }
-      
-      return data.token;
-    } catch (error) {
-      debugLog("��ȡ����tokenʧ��: %v", error);
-      throw error;
-    }
-  }
-  
-  // ��������API
-  async function callUpstreamWithHeaders(
-    upstreamReq: UpstreamRequest, 
-    refererChatID: string, 
-    authToken: string
-  ): Promise<Response> {
-    try {
-      debugLog("��������API: %s", UPSTREAM_URL);
-      
-      // �ر���ͼ�¼ȫ��λ��ģ̬��?
-      const hasMultimedia = upstreamReq.messages.some(msg => 
-        Array.isArray(msg.content) && 
-        msg.content.some(block => 
-          ['image_url', 'video_url', 'document_url', 'audio_url'].includes(block.type)
-        )
-      );
-      
-      if (hasMultimedia) {
-        debugLog("?? ���������ģ̬���ݣ����ڷ��͵�����...");
-        
-        for (let i = 0; i < upstreamReq.messages.length; i++) {
-          const msg = upstreamReq.messages[i];
-          if (Array.isArray(msg.content)) {
-            for (let j = 0; j < msg.content.length; j++) {
-              const block = msg.content[j];
-              
-              // ����ͼ��
-              if (block.type === 'image_url' && block.image_url?.url) {
-                const url = block.image_url.url;
-                if (url.startsWith('data:image/')) {
-                  const mimeMatch = url.match(/data:image\/([^;]+)/);
-                  const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  const sizeKB = Math.round(url.length * 0.75 / 1024); // base64 ��Լ��ԭ�ļ�?1.33 ?
-                  debugLog("???��Ϣ[%d] ͼ��[%d]: %s��ʽ, ���ݳ���: %d�ַ� (~%dKB)", 
-                    i, j, format, url.length, sizeKB);
-                  
-                  // ͼƬ��С����
-                  if (sizeKB > 1000) {
-                    debugLog("??  ͼƬ�ϴ� (%dKB)�����ܵ������δ���ʧ��", sizeKB);
-                    debugLog("?? ����: ��ͼƬѹ���� 500KB ����");
-                  } else if (sizeKB > 500) {
-                    debugLog("??  ͼƬƫ�� (%dKB)������ѹ��", sizeKB);
-                  }
-                } else {
-                  debugLog("?? ��Ϣ[%d] ͼ��[%d]: �ⲿURL - %s", i, j, url);
-                }
-              }
-              
-              // ������Ƶ
-              if (block.type === 'video_url' && block.video_url?.url) {
-                const url = block.video_url.url;
-                if (url.startsWith('data:video/')) {
-                  const mimeMatch = url.match(/data:video\/([^;]+)/);
-                  const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
-                    i, j, format, url.length);
-                } else {
-                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: �ⲿURL - %s", i, j, url);
-                }
-              }
-              
-              // �����ĵ�
-              if (block.type === 'document_url' && block.document_url?.url) {
-                const url = block.document_url.url;
-                if (url.startsWith('data:application/')) {
-                  const mimeMatch = url.match(/data:application\/([^;]+)/);
-                  const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog("?? ��Ϣ[%d] �ĵ�[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
-                    i, j, format, url.length);
-                } else {
-                  debugLog("?? ��Ϣ[%d] �ĵ�[%d]: �ⲿURL - %s", i, j, url);
-                }
-              }
-              
-              // ������Ƶ
-              if (block.type === 'audio_url' && block.audio_url?.url) {
-                const url = block.audio_url.url;
-                if (url.startsWith('data:audio/')) {
-                  const mimeMatch = url.match(/data:audio\/([^;]+)/);
-                  const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: %s��ʽ, ���ݳ���: %d�ַ�", 
-                    i, j, format, url.length);
-                } else {
-                  debugLog("?? ��Ϣ[%d] ��Ƶ[%d]: �ⲿURL - %s", i, j, url);
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      debugLog("��������? %s", JSON.stringify(upstreamReq));
-      
-      const response = await fetch(UPSTREAM_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json, text/event-stream",
-          "User-Agent": BROWSER_UA,
-          "Authorization": `Bearer ${authToken}`,
-          "Accept-Language": "zh-CN",
-          "sec-ch-ua": SEC_CH_UA,
-          "sec-ch-ua-mobile": SEC_CH_UA_MOB,
-          "sec-ch-ua-platform": SEC_CH_UA_PLAT,
-          "X-FE-Version": X_FE_VERSION,
-          "Origin": ORIGIN_BASE,
-          "Referer": `${ORIGIN_BASE}/c/${refererChatID}`
-        },
-        body: JSON.stringify(upstreamReq)
-      });
-      
-      debugLog("������Ӧ? %d %s", response.status, response.statusText);
-      return response;
-    } catch (error) {
-      debugLog("��������ʧ��: %v", error);
-      throw error;
-    }
-  }
-  
-  function transformThinking(content: string): string {
-    // ?<summary>?/summary>
-    let result = content.replace(/<summary>.*?<\/summary>/gs, "");
-    // ��������Զ����ǩ��?</thinking>?Full> ?
-    result = result.replace(/<\/thinking>/g, "");
-    result = result.replace(/<Full>/g, "");
-    result = result.replace(/<\/Full>/g, "");
-    result = result.trim();
-    
-    switch (THINK_TAGS_MODE as "strip" | "think" | "raw") {
-      case "think":
-        result = result.replace(/<details[^>]*>/g, "<thinking>");
-        result = result.replace(/<\/details>/g, "</thinking>");
-        break;
-      case "strip":
-        result = result.replace(/<details[^>]*>/g, "");
-        result = result.replace(/<\/details>/g, "");
-        break;
-    }
-    
-    // ����ÿ��ǰ׺ "> "��������ʼλ�ã�
-    result = result.replace(/^> /, "");
-    result = result.replace(/\n> /g, "\n");
-    return result.trim();
-  }
-  
-  async function processUpstreamStream(
-    body: ReadableStream<Uint8Array>,
-    writer: WritableStreamDefaultWriter<Uint8Array>,
-    encoder: TextEncoder,
-    modelName: string
-  ): Promise<void> {
-    const reader = body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-    
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || ""; // �������һ������������
-        
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const dataStr = line.substring(6);
-            if (dataStr === "") continue;
-            
-            debugLog("�յ�SSE����: %s", dataStr);
-            
-            try {
-              const upstreamData = JSON.parse(dataStr) as UpstreamData;
-              
-              // �����?
-              if (upstreamData.error || upstreamData.data.error || 
-                  (upstreamData.data.inner && upstreamData.data.inner.error)) {
-                const errObj = upstreamData.error || upstreamData.data.error || 
-                             (upstreamData.data.inner && upstreamData.data.inner.error);
-                debugLog("���δ���: code=%d, detail=%s", errObj?.code, errObj?.detail);
-                
-                // �����������ͣ��ر��Ƕ�ģ̬��ش���
-                const errorDetail = (errObj?.detail || "").toLowerCase();
-                if (errorDetail.includes("something went wrong") || errorDetail.includes("try again later")) {
-                  debugLog("?? Z.ai �������������");
-                  debugLog("   ?? ��������: %s", errObj?.detail);
-                  debugLog("   ??? ����ԭ��: ͼƬ����ʧ��");
-                  debugLog("   ?? ����������:");
-                  debugLog("      1. ʹ�ø�С��ͼƬ(< 500KB)");
-                  debugLog("      2. ���Բ�ͬ��ͼƬ��ʽ(JPEG ������PNG)");
-                  debugLog("      3. �Ժ����� (�����Ƿ�������������)");
-                  debugLog("      4. ���ͼƬ�Ƿ���");
-                }
-                
-                // ���ͽ���chunk
-                const endChunk: OpenAIResponse = {
-                  id: `chatcmpl-${Date.now()}`,
-                  object: "chat.completion.chunk",
-                  created: Math.floor(Date.now() / 1000),
-                  model: modelName,
-                  choices: [
-                    {
-                      index: 0,
-                      delta: {},
-                      finish_reason: "stop"
-                    }
-                  ]
-                };
-                
-                await writer.write(encoder.encode(`data: ${JSON.stringify(endChunk)}\n\n`));
-                await writer.write(encoder.encode("data: [DONE]\n\n"));
-                return;
-              }
-              
-              debugLog("�����ɹ� - ����: %s, �׶�: %s, ���ݳ���: %d, ���: %v",
-                upstreamData.type, upstreamData.data.phase, 
-                upstreamData.data.delta_content ? upstreamData.data.delta_content.length : 0, 
-                upstreamData.data.done);
-              
-              // ��������
-              if (upstreamData.data.delta_content && upstreamData.data.delta_content !== "") {
-                let out = upstreamData.data.delta_content;
-                if (upstreamData.data.phase === "thinking") {
-                  out = transformThinking(out);
-                }
-                
-                if (out !== "") {
-                  debugLog("������?%s): %s", upstreamData.data.phase, out);
-                  
-                  const chunk: OpenAIResponse = {
-                    id: `chatcmpl-${Date.now()}`,
-                    object: "chat.completion.chunk",
-                    created: Math.floor(Date.now() / 1000),
-                    model: modelName,
-                    choices: [
-                      {
-                        index: 0,
-                        delta: { content: out }
-                      }
-                    ]
-                  };
-                  
-                  await writer.write(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
-                }
-              }
-              
-              // ����Ƿ����
-              if (upstreamData.data.done || upstreamData.data.phase === "done") {
-                debugLog("��⵽�������ź�");
-                
-                // ���ͽ���chunk
-                const endChunk: OpenAIResponse = {
-                  id: `chatcmpl-${Date.now()}`,
-                  object: "chat.completion.chunk",
-                  created: Math.floor(Date.now() / 1000),
-                  model: modelName,
-                  choices: [
-                    {
-                      index: 0,
-                      delta: {},
-                      finish_reason: "stop"
-                    }
-                  ]
-                };
-                
-                await writer.write(encoder.encode(`data: ${JSON.stringify(endChunk)}\n\n`));
-                await writer.write(encoder.encode("data: [DONE]\n\n"));
-                return;
-              }
-            } catch (error) {
-              debugLog("SSE���ݽ���ʧ��: %v", error);
-            }
-          }
-        }
-      }
-    } finally {
-      writer.close();
-    }
-  }
-  
-  // �ռ�������Ӧ�����ڷ���ʽ��Ӧ?
-  async function collectFullResponse(body: ReadableStream<Uint8Array>): Promise<string> {
-    const reader = body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-    let fullContent = "";
-    
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || ""; // �������һ������������
-        
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const dataStr = line.substring(6);
-            if (dataStr === "") continue;
-            
-            try {
-              const upstreamData = JSON.parse(dataStr) as UpstreamData;
-              
-              if (upstreamData.data.delta_content !== "") {
-                let out = upstreamData.data.delta_content;
-                if (upstreamData.data.phase === "thinking") {
-                  out = transformThinking(out);
-                }
-                
-                if (out !== "") {
-                  fullContent += out;
-                }
-              }
-              
-              // ����Ƿ����
-              if (upstreamData.data.done || upstreamData.data.phase === "done") {
-                debugLog("��⵽����źţ�ֹͣ�ռ�");
-                return fullContent;
-              }
-            } catch (error) {
-              // ���Խ�������
-            }
-          }
-        }
-      }
-    } finally {
-      reader.releaseLock();
-    }
-    
-    return fullContent;
-  }
-  
-  /**
-   * HTTP服务器和路由处理
-   */
-  
-  function getIndexHTML(): string {
-    return `<!DOCTYPE html>
-  <html lang="zh-CN">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>����API - רҵOpenAI���ݽӿڷ���</title>
-      <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-      <style>
-          /* ������ʽ���� */
-          * {
-              box-sizing: border-box;
-          }
-          
-          body {
-              font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-              background-color: #f8f9fa;
-              margin: 0;
-              padding: 0;
-              line-height: 1.6;
-              color: #2c3e50;
-          }
-          
-          /* ��������?*/
-          .navbar-custom {
-              background-color: #2c3e50;
-              border: none;
-              border-radius: 0;
-              margin-bottom: 0;
-              min-height: 60px;
-              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          }
-          
-          .navbar-custom .navbar-brand {
-              color: #ffffff !important;
-              font-size: 22px;
-              font-weight: 700;
-              padding: 18px 15px;
-              text-decoration: none;
-          }
-          
-          .navbar-custom .navbar-brand:hover {
-              color: #ffffff !important;
-              text-decoration: none;
-          }
-          
-          .navbar-custom .navbar-nav > li > a {
-              color: #ffffff !important;
-              font-size: 16px;
-              padding: 20px 20px;
-              transition: background-color 0.3s ease;
-              text-decoration: none;
-          }
-          
-          .navbar-custom .navbar-nav > li > a:hover {
-              background-color: rgba(255, 255, 255, 0.1) !important;
-              color: #ffffff !important;
-              text-decoration: none;
-          }
-          
-          /* ��������Ҫ������?*/
-          .main-content {
-              min-height: calc(100vh - 60px);
-              padding: 40px 0;
-          }
-          
-          .container {
-              max-width: 1200px;
-              margin: 0 auto;
-              padding: 0 15px;
-          }
-          
-          /* ��Ƭ��ʽ */
-          .card {
-              background: #ffffff;
-              border-radius: 8px;
-              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-              margin-bottom: 30px;
-              overflow: hidden;
-              border: 1px solid #e9ecef;
-              transition: all 0.3s ease;
-          }
-          
-          .card:hover {
-              transform: translateY(-2px);
-              box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-          }
-          
-          .card-header {
-              background: #f8f9fa;
-              border-bottom: 1px solid #e9ecef;
-              padding: 20px 30px;
-              font-weight: 600;
-              font-size: 18px;
-              color: #2c3e50;
-          }
-          
-          .card-body {
-              padding: 30px;
-          }
-          
-          /* Ӣ��������ʽ */
-          .hero-section {
-              background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-              color: white;
-              text-align: center;
-              padding: 80px 30px;
-              margin-bottom: 40px;
-              border-radius: 8px;
-              position: relative;
-              overflow: hidden;
-          }
-          
-          .hero-section::before {
-              content: '';
-              position: absolute;
-              top: 0;
-              left: 0;
-              right: 0;
-              bottom: 0;
-              background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-              opacity: 0.1;
-          }
-          
-          .hero-content {
-              position: relative;
-              z-index: 1;
-          }
-          
-          .hero-title {
-              font-size: 3.5rem;
-              font-weight: 700;
-              margin-bottom: 20px;
-              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          }
-          
-          .hero-subtitle {
-              font-size: 1.3rem;
-              margin-bottom: 15px;
-              opacity: 0.95;
-              font-weight: 500;
-          }
-          
-          .hero-description {
-              font-size: 1.1rem;
-              opacity: 0.9;
-              max-width: 600px;
-              margin: 0 auto 30px auto;
-              line-height: 1.7;
-          }
-          
-          /* ��ť��ʽ */
-          .btn {
-              padding: 12px 25px;
-              font-size: 16px;
-              font-weight: 600;
-              border-radius: 6px;
-              border: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              text-decoration: none;
-              display: inline-block;
-              text-align: center;
-              line-height: 1.4;
-          }
-          
-          .btn-primary {
-              background-color: #3498db;
-              color: #ffffff;
-          }
-          
-          .btn-primary:hover {
-              background-color: #2980b9;
-              transform: translateY(-1px);
-              box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-              color: #ffffff;
-              text-decoration: none;
-          }
-          
-          .btn-success {
-              background-color: #27ae60;
-              color: #ffffff;
-          }
-          
-          .btn-success:hover {
-              background-color: #229954;
-              transform: translateY(-1px);
-              box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
-              color: #ffffff;
-              text-decoration: none;
-          }
-          
-          .btn-lg {
-              padding: 15px 35px;
-              font-size: 18px;
-          }
-          
-          /* ���Կ�Ƭ��?*/
-          .features-grid {
-              display: grid;
-              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-              gap: 30px;
-              margin-top: 30px;
-          }
-          
-          .feature-card {
-              background: #ffffff;
-              border-radius: 8px;
-              padding: 30px;
-              text-align: center;
-              border: 1px solid #e9ecef;
-              transition: all 0.3s ease;
-              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-          }
-          
-          .feature-card:hover {
-              transform: translateY(-5px);
-              box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-          }
-          
-          .feature-icon {
-              font-size: 3rem;
-              margin-bottom: 20px;
-              display: block;
-              color: #3498db;
-          }
-          
-          .feature-title {
-              font-size: 1.3rem;
-              font-weight: 600;
-              color: #2c3e50;
-              margin-bottom: 15px;
-          }
-          
-          .feature-description {
-              color: #7f8c8d;
-              line-height: 1.6;
-          }
-          
-          /* ҳ����ʽ */
-          .footer {
-              background-color: #2c3e50;
-              color: #ffffff;
-              text-align: center;
-              padding: 30px 0;
-              margin-top: 60px;
-          }
-          
-          .footer a {
-              color: #3498db;
-              text-decoration: none;
-              font-weight: 500;
-          }
-          
-          .footer a:hover {
-              color: #5dade2;
-              text-decoration: none;
-          }
-          
-          /* ״ָ̬ʾ�� */
-          .status-indicator {
-              display: inline-block;
-              width: 12px;
-              height: 12px;
-              border-radius: 50%;
-              background-color: #27ae60;
-              margin-right: 8px;
-              animation: pulse 2s infinite;
-          }
-          
-          @keyframes pulse {
-              0% { opacity: 1; }
-              50% { opacity: 0.6; }
-              100% { opacity: 1; }
-          }
-          
-          /* ��Ӧʽ��?*/
-          @media (max-width: 768px) {
-              .main-content {
-                  padding: 20px 0;
-              }
-              
-              .hero-section {
-                  padding: 50px 20px;
-              }
-              
-              .hero-title {
-                  font-size: 2.5rem;
-              }
-              
-              .hero-subtitle {
-                  font-size: 1.1rem;
-              }
-              
-              .card-body {
-                  padding: 20px;
-              }
-              
-              .btn {
-                  padding: 10px 20px;
-                  font-size: 14px;
-              }
-              
-              .features-grid {
-                  grid-template-columns: 1fr;
-                  gap: 20px;
-              }
-              
-              .feature-card {
-                  padding: 20px;
-              }
-          }
-          
-          @media (max-width: 480px) {
-              .hero-title {
-                  font-size: 2rem;
-              }
-              
-      .container {
-                  padding: 0 10px;
-              }
-          }
-          
-          /* ʵ�ù���?*/
-          .text-center { text-align: center; }
-          .text-right { text-align: right; }
-          .mb-0 { margin-bottom: 0 !important; }
-          .mb-1 { margin-bottom: 10px !important; }
-          .mb-2 { margin-bottom: 20px !important; }
-          .mb-3 { margin-bottom: 30px !important; }
-          .mt-0 { margin-top: 0 !important; }
-          .mt-1 { margin-top: 10px !important; }
-          .mt-2 { margin-top: 20px !important; }
-          .mt-3 { margin-top: 30px !important; }
-  </style>
-  </head>
-  <body>
-      <!-- ����?-->
-      <nav class="navbar navbar-custom">
-  <div class="container">
-              <div class="navbar-header">
-                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
-                      <span class="sr-only">Toggle navigation</span>
-                      <span class="icon-bar"></span>
-                      <span class="icon-bar"></span>
-                      <span class="icon-bar"></span>
-                  </button>
-                  <a class="navbar-brand" href="/">?? ����API</a>
-              </div>
-              <div class="collapse navbar-collapse" id="navbar-collapse">
-                  <ul class="navbar-nav navbar-right">
-                      <li><a href="/v1/models">?? ģ���б�</a></li>
-                      <li><a href="HTTP服务器和路由处理
-          </ul>
-      </div>
-          </div>
-      </nav>
-
-      <!-- ��Ҫ���� -->
-      <div class="main-content">
-          <div class="container">
-              <!-- Ӣ������ -->
-              <div class="hero-section">
-                  <div class="hero-content">
-                      <h1 class="hero-title">����API</h1>
-                      <div class="hero-subtitle">רҵ?OpenAI ���ݽӿڷ���</div>
-                      <p class="hero-description">
-                          �ṩ��ѡ��ȶ���������?GLM-4.5 ģ�ͷ��ʷ�����ȫ��?OpenAI �ӿڱ�׼?
-                          Ϊ�����ߺ��о����ṩ��ݵ�AI�������룬��������Ӧ�ÿ���?
-                      </p>
-                      <div class="text-center">
-                          <span class="status-indicator"></span>
-                          <span style="color: rgba(255,255,255,0.9);">��������?/span>
-                          <div class="mt-2">
-                              <a href="/v1/models" class="btn btn-primary btn-lg">?? ��ʼʹ?/a>
-              </div>
-              </div>
-              </div>
-          </div>
-          
-              <!-- API���ʿ�Ƭ -->
-              <div class="card">
-                  <div class="card-header">
-                      ?? ����ģ��
-              </div>
-                  <div class="card-body">
-                      <div class="row">
-                          <div class="col-md-8">
-                              <h4 class="mt-0">GLM-4.5 ϵ��ģ��</h4>
-                              <p class="text-muted">֧���ı����ɡ���ģ̬���ȶ���AI����������OpenAI��׼�ӿ�?/p>
-                              <ul class="list-unstyled">
-                                  <li><strong>GLM-4.5</strong> - �������ı�����ģ��</li>
-                                  <li><strong>GLM-4.5V</strong> - ��ģ̬���ģ�ͣ�ͼ����Ƶ���ĵ���</li>
-                              </ul>
-              </div>
-                          <div class="col-md-4 text-center">
-                              <a href="/v1/models" class="btn btn-success">�鿴ģ���б�</a>
-                              <div class="mt-2">
-                                  <small class="text-muted">��ȫ���ʹ��</small>
-              </div>
-              </div>
-          </div>
-          </div>
-          </div>
-          
-              <!-- ����չ?-->
-              <div class="card">
-                  <div class="card-header">
-                      ?������?
-          </div>
-                  <div class="card-body">
-                      <div class="features-grid">
-                          <div class="feature-card">
-                              <div class="feature-icon">?/div>
-                              <h4 class="feature-title">������</h4>
-                              <p class="feature-description">�Ż������������ʽ��Ӧ��ȷ�������ȶ���API��������</p>
-          </div>
-                          <div class="feature-card">
-                              <div class="feature-icon">??</div>
-                              <h4 class="feature-title">��ȫ�ɿ�</h4>
-                              <p class="feature-description">������ҵ����ȫ��ʩ���������ݴ����API���ʵİ�ȫ?/p>
-                          </div>
-                          <div class="feature-card">
-                              <div class="feature-icon">??</div>
-                              <h4 class="feature-title">��ȫ����</h4>
-                              <p class="feature-description">100% ���� OpenAI API ��׼�������޸����д��뼴���л�ʹ��</p>
-                          </div>
-                          <div class="feature-card">
-                              <div class="feature-icon">??</div>
-                              <h4 class="feature-title">��ģ̬֧?/h4>
-                              <p class="feature-description">֧���ı���ͼ����Ƶ�ȶ������ݸ�ʽ�����ܴ�������</p>
-                          </div>
-                          <div class="feature-card">
-                              <div class="feature-icon">??</div>
-                              <h4 class="feature-title">��ȫ���</h4>
-                              <p class="feature-description">�������ʷ������踶�Ѽ�������רҵ����AI�ӿڷ���</p>
-                          </div>
-                          <div class="feature-card">
-                              <div class="feature-icon">??</div>
-                              <h4 class="feature-title">ʵʱ���</h4>
-                              <p class="feature-description">�ṩ��ϸ��ʹ��ͳ�ƺ����ܼ�أ����ڿ������Ժ��Ż�</p>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-
-      <!-- ҳ�� -->
-      <div class="footer">
-          <div class="container">
-              <p class="mb-0">
-                  ? <a href="https://www.nodeloc.com/u/pastking" target="_blank">@https://www.nodeloc.com/u/pastking</a>
-                  <br>
-                  <small style="opacity: 0.8;">���� Deno ���� �� ��ѿ�?�� ���񿪷�����?/small>
-              </p>
-          </div>
-  </div>
-  
-      <!-- JavaScript -->
-      <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-      <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  </body>
-  </html>`;
-  }
-  
-  /**
-   * HTTP服务器和路由处理
+   * HTTP��������·�ɴ���
    */
   
   async function handleIndex(request: Request): Promise<Response> {
@@ -2198,7 +1261,7 @@ declare namespace Deno {
       return new Response(null, { status: 200, headers });
     }
     
-    // ֧�ֵ�ģ��
+    // ???????
     const models = SUPPORTED_MODELS.map(model => ({
       id: model.name,
         object: "model",
@@ -2224,7 +1287,7 @@ declare namespace Deno {
     const path = url.pathname;
     const userAgent = request.headers.get("User-Agent") || "";
     
-    debugLog("�յ�chat completions����");
+    debugLog("???chat completions????");
     
     const headers = new Headers();
     setCORSHeaders(headers);
@@ -2233,10 +1296,10 @@ declare namespace Deno {
       return new Response(null, { status: 200, headers });
     }
     
-    // ��֤API Key
+    // ???API Key
     const authHeader = request.headers.get("Authorization");
     if (!validateApiKey(authHeader)) {
-      debugLog("ȱ�ٻ���Ч��Authorizationͷ");
+      debugLog("??????��??Authorization?");
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 401);
       addLiveRequest(request.method, path, 401, duration, userAgent);
@@ -2246,12 +1309,12 @@ declare namespace Deno {
       });
     }
     
-    // ��ȡ������
+    // 启动服务器
     let body: string;
     try {
       body = await request.text();
     } catch (error) {
-      debugLog("��ȡ������ʧ��: %v", error);
+      debugLog("????????????: %v", error);
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 400);
       addLiveRequest(request.method, path, 400, duration, userAgent);
@@ -2261,12 +1324,12 @@ declare namespace Deno {
       });
     }
     
-    // ��������
+    // ????????
     let req: OpenAIRequest;
     try {
       req = JSON.parse(body) as OpenAIRequest;
     } catch (error) {
-      debugLog("JSON����ʧ��: %v", error);
+      debugLog("JSON???????: %v", error);
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 400);
       addLiveRequest(request.method, path, 400, duration, userAgent);
@@ -2276,22 +1339,22 @@ declare namespace Deno {
       });
     }
     
-    // ����ͻ���û����ȷָ��stream������ʹ��Ĭ��ֵ
+    // 启动服务器????????stream?????????????
     if (!body.includes('"stream"')) {
       req.stream = DEFAULT_STREAM;
     }
     
-    // ��ȡģ������
+    // 启动服务器?
     const modelConfig = getModelConfig(req.model);
     
-    // �������֤��Ϣ
+    // 启动服务器??
     const processedMessages = processMessages(req.messages, modelConfig);
     
-    // ���ɻỰ���ID
+    // ????????ID
     const chatID = `${Date.now()}-${Math.floor(Date.now() / 1000)}`;
     const msgID = Date.now().toString();
     
-    // ������������
+    // 启动服务器???
     const upstreamReq: UpstreamRequest = {
       stream: true,
       chat_id: chatID,
@@ -2317,18 +1380,18 @@ declare namespace Deno {
       }
     };
     
-    // ѡ��token
+    // ???token
     let authToken = ZAI_TOKEN;
     if (ANON_TOKEN_ENABLED) {
       try {
         const anonToken = await getAnonymousToken();
         authToken = anonToken;
       } catch (error) {
-        debugLog("����token��ȡʧ�ܣ����˹̶�token: %v", error);
+        debugLog("????token?????????????token: %v", error);
       }
     }
     
-    // ��������API
+    // ????????API
     try {
       if (req.stream) {
         return await handleStreamResponse(upstreamReq, chatID, authToken, startTime, path, userAgent, req, modelConfig);
@@ -2336,7 +1399,7 @@ declare namespace Deno {
         return await handleNonStreamResponse(upstreamReq, chatID, authToken, startTime, path, userAgent, req, modelConfig);
       }
     } catch (error) {
-      debugLog("��������ʧ��: %v", error);
+      debugLog("???????????: %v", error);
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 502);
       addLiveRequest(request.method, path, 502, duration, userAgent);
@@ -2374,12 +1437,12 @@ declare namespace Deno {
         return new Response("Upstream response body is empty", { status: 502 });
       }
       
-      // ������ʽ��Ӧ
+      // 启动服务器?
       const { readable, writable } = new TransformStream();
       const writer = writable.getWriter();
       const encoder = new TextEncoder();
       
-      // ���͵�һ��chunk
+      // ????????chunk
       const firstChunk: OpenAIResponse = {
         id: `chatcmpl-${Date.now()}`,
         object: "chat.completion.chunk",
@@ -2395,12 +1458,12 @@ declare namespace Deno {
       
       writer.write(encoder.encode(`data: ${JSON.stringify(firstChunk)}\n\n`));
       
-      // ����������
+      // 启动服务器?
       processUpstreamStream(response.body, writer, encoder, req.model).catch(error => {
-        debugLog("����������ʱ����: %v", error);
+        debugLog("???????????????: %v", error);
       });
       
-      // ��¼�ɹ�ͳ��
+      // 启动服务器
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 200);
       addLiveRequest("POST", path, 200, duration, userAgent, modelConfig.name);
@@ -2452,10 +1515,10 @@ declare namespace Deno {
         return new Response("Upstream response body is empty", { status: 502 });
       }
       
-      // �ռ�������Ӧ
+      // 启动服务器?
       const finalContent = await collectFullResponse(response.body);
       
-      // ������Ӧ
+      // ???????
       const openAIResponse: OpenAIResponse = {
         id: `chatcmpl-${Date.now()}`,
         object: "chat.completion",
@@ -2478,7 +1541,7 @@ declare namespace Deno {
         }
       };
       
-      // ��¼�ɹ�ͳ��
+      // 启动服务器
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 200);
       addLiveRequest("POST", path, 200, duration, userAgent, modelConfig.name);
@@ -2501,28 +1564,28 @@ declare namespace Deno {
     }
   }
   
-  // Dashboard���ĵ��������Ƴ�
+  // Dashboard??????????????
 
-  // ��HTTP服务器和路由处理
+  // ??HTTP��������·�ɴ���
   async function main() {
-  console.log(`OpenAI����API���������`);
-  console.log(`֧�ֵ�ģ��: ${SUPPORTED_MODELS.map(m => `${m.id} (${m.name})`).join(', ')}`);
-  console.log(`����: ${UPSTREAM_URL}`);
-  console.log(`Debugģʽ: ${DEBUG_MODE}`);
-  console.log(`Ĭ����ʽ��Ӧ: ${DEFAULT_STREAM}`);
-  console.log(`Dashboard����: ${DASHBOARD_ENABLED}`);
+  console.log(`OpenAI????API?????????`);
+  console.log(`???????: ${SUPPORTED_MODELS.map(m => `${m.id} (${m.name})`).join(', ')}`);
+  console.log(`????: ${UPSTREAM_URL}`);
+  console.log(`Debug??: ${DEBUG_MODE}`);
+  console.log(`?????????: ${DEFAULT_STREAM}`);
+  console.log(`Dashboard????: ${DASHBOARD_ENABLED}`);
   
-  // ����Ƿ���Deno Deploy������
+  // ????????Deno Deploy??????
   const isDenoDeploy = Deno.env.get("DENO_DEPLOYMENT_ID") !== undefined;
   
   if (isDenoDeploy) {
-    // Deno Deploy����
-    console.log("������Deno Deploy������");
+    // Deno Deploy????
+    console.log("??????Deno Deploy??????");
     Deno.serve(handleRequest);
   } else {
-    // ���ػ����йܻ���
+    // ????????��????
     const port = parseInt(Deno.env.get("PORT") || "9090");
-    console.log(`�����ڱ��ػ����У��˿�: ${port}`);
+    console.log(`?????????????��????: ${port}`);
     
     const server = Deno.listen({ port });
     
@@ -2532,7 +1595,7 @@ declare namespace Deno {
   }
   }
   
-  // ����HTTP服务器和路由处理
+  // ????HTTP��������·�ɴ���
   async function handleHttp(conn: Deno.Conn) {
     const httpConn = Deno.serveHttp(conn);
     
@@ -2546,7 +1609,7 @@ declare namespace Deno {
       const userAgent = request.headers.get("User-Agent") || "";
   
   try {
-    // ·�ɷַ�
+    // ��????
     if (url.pathname === "/") {
       const response = await handleIndex(request);
       await respondWith(response);
@@ -2560,7 +1623,7 @@ declare namespace Deno {
     } else if (url.pathname === "/v1/chat/completions") {
       const response = await handleChatCompletions(request);
       await respondWith(response);
-      // ����ͳ������handleChatCompletions�м�¼
+      // 启动服务器??handleChatCompletions?��??
     } else {
       const response = await handleOptions(request);
       await respondWith(response);
@@ -2568,7 +1631,7 @@ declare namespace Deno {
       addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
     }
   } catch (error) {
-    debugLog("��������ʱ����: %v", error);
+    debugLog("?????????????: %v", error);
     const response = new Response("Internal Server Error", { status: 500 });
     await respondWith(response);
     recordRequestStats(startTime, url.pathname, 500);
@@ -2577,14 +1640,14 @@ declare namespace Deno {
   }
   }
   
-  // ����HTTP服务器和路由处理
+  // ????HTTP��������·�ɴ���
   async function handleRequest(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const startTime = Date.now();
     const userAgent = request.headers.get("User-Agent") || "";
   
     try {
-      // ·�ɷַ�
+      // ��????
       if (url.pathname === "/") {
         const response = await handleIndex(request);
         recordRequestStats(startTime, url.pathname, response.status);
@@ -2597,7 +1660,7 @@ declare namespace Deno {
         return response;
       } else if (url.pathname === "/v1/chat/completions") {
         const response = await handleChatCompletions(request);
-        // ����ͳ������handleChatCompletions�м�¼
+        // 启动服务器??handleChatCompletions?��??
         return response;
       } else {
         const response = await handleOptions(request);
@@ -2606,14 +1669,14 @@ declare namespace Deno {
         return response;
       }
     } catch (error) {
-      debugLog("��������ʱ����: %v", error);
+      debugLog("处理请求时出错: %v", error);
       recordRequestStats(startTime, url.pathname, 500);
       addLiveRequest(request.method, url.pathname, 500, Date.now() - startTime, userAgent);
       return new Response("Internal Server Error", { status: 500 });
     }
   }
   
-  // ���������
+  // 启动服务器
   main();
 
 
