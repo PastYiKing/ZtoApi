@@ -274,8 +274,7 @@ declare namespace Deno {
     const found = SUPPORTED_MODELS.find(m => m.id === normalizedModelId);
     
     if (!found) {
-      debugLog("未知模型 %s (规范化后: %s)，使用默认模型 %s", 
-        modelId, normalizedModelId, DEFAULT_MODEL.name);
+      debugLog(`未知模型 ${modelId} (规范化后: ${normalizedModelId})，使用默认模型 ${DEFAULT_MODEL.name}`);
     }
     
     return found || DEFAULT_MODEL;
@@ -302,7 +301,7 @@ declare namespace Deno {
     
     const mapped = modelMappings[normalized];
     if (mapped) {
-      debugLog(" 
+      debugLog(`模型映射: ${normalized} -> ${mapped}`);
       return mapped;
     }
     
@@ -321,9 +320,9 @@ declare namespace Deno {
       
       // 检查是否为视觉模型
       if (Array.isArray(message.content)) {
-        debugLog("
+        debugLog("处理多媒体消息内容");
         
-        // 
+        // 统计媒体类型
         const mediaStats = {
           text: 0,
           images: 0,
@@ -335,8 +334,8 @@ declare namespace Deno {
         
         // 检查是否为视觉模型
         if (!modelConfig.capabilities.vision) {
-          debugLog("
-          // 启动服务器
+          debugLog("模型不支持视觉功能，转换为文本内容");
+          // 提取文本内容
           const textContent = message.content
             .filter(block => block.type === 'text')
             .map(block => block.text)
@@ -349,7 +348,7 @@ declare namespace Deno {
               case 'text':
                 if (block.text) {
                   mediaStats.text++;
-                  debugLog(" 
+                  debugLog(`发现文本内容: ${block.text.substring(0, 50)}...`);
                 }
                 break;
                 
@@ -360,11 +359,11 @@ declare namespace Deno {
                   if (url.startsWith('data:image/')) {
                     const mimeMatch = url.match(/data:image\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog("
+                    debugLog(`发现Base64图片，格式: ${format}`);
                   } else if (url.startsWith('http')) {
-                    debugLog(" 
+                    debugLog(`发现网络图片: ${url.substring(0, 50)}...`);
                   } else {
-                    debugLog(" 
+                    debugLog(`发现其他格式图片: ${url.substring(0, 30)}...`);
                   }
                 }
                 break;
@@ -376,11 +375,11 @@ declare namespace Deno {
                   if (url.startsWith('data:video/')) {
                     const mimeMatch = url.match(/data:video\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog(" 
+                    debugLog(`发现Base64视频，格式: ${format}`);
                   } else if (url.startsWith('http')) {
-                    debugLog(" 
+                    debugLog(`发现网络视频: ${url.substring(0, 50)}...`);
                   } else {
-                    debugLog(" 
+                    debugLog(`发现其他格式视频: ${url.substring(0, 30)}...`);
                   }
                 }
                 break;
@@ -392,11 +391,11 @@ declare namespace Deno {
                   if (url.startsWith('data:application/')) {
                     const mimeMatch = url.match(/data:application\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog(" 
+                    debugLog(`发现Base64文档，格式: ${format}`);
                   } else if (url.startsWith('http')) {
-                    debugLog(" 
+                    debugLog(`发现网络文档: ${url.substring(0, 50)}...`);
                   } else {
-                    debugLog(" 
+                    debugLog(`发现其他格式文档: ${url.substring(0, 30)}...`);
                   }
                 }
                 break;
@@ -408,30 +407,30 @@ declare namespace Deno {
                   if (url.startsWith('data:audio/')) {
                     const mimeMatch = url.match(/data:audio\/([^;]+)/);
                     const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                    debugLog(" 
+                    debugLog(`发现Base64音频，格式: ${format}`);
                   } else if (url.startsWith('http')) {
-                    debugLog(" 
+                    debugLog(`发现网络音频: ${url.substring(0, 50)}...`);
                   } else {
-                    debugLog(" 
+                    debugLog(`发现其他格式音频: ${url.substring(0, 30)}...`);
                   }
                 }
                 break;
                 
               default:
                 mediaStats.others++;
-                debugLog("?
+                debugLog("执行中...");?
             }
           }
           
           // 启动服务器
           const totalMedia = mediaStats.images + mediaStats.videos + mediaStats.documents + mediaStats.audios;
           if (totalMedia > 0) {
-            debugLog(" 
+            debugLog("执行中..."); 
               mediaStats.text, mediaStats.images, mediaStats.videos, mediaStats.documents, mediaStats.audios);
           }
         }
       } else if (typeof message.content === 'string') {
-        debugLog(" 
+        debugLog("执行中..."); 
       }
       
       processedMessages.push(processedMessage);
@@ -513,7 +512,7 @@ declare namespace Deno {
     try {
       // 
       if (!Array.isArray(liveRequests)) {
-        debugLog("liveRequests
+        debugLog("liveRequests数据格式错误，重置为空数组");
         liveRequests = [];
       }
       
@@ -530,7 +529,7 @@ declare namespace Deno {
       
       return JSON.stringify(requestData);
     } catch (error) {
-      debugLog("
+      debugLog("执行中...");
       return JSON.stringify([]);
     }
   }
@@ -539,7 +538,7 @@ declare namespace Deno {
     try {
       // 
       if (!stats) {
-        debugLog("stats
+        debugLog("stats数据不存在，使用默认值");
         stats = {
           totalRequests: 0,
           successfulRequests: 0,
@@ -559,7 +558,7 @@ declare namespace Deno {
       
       return JSON.stringify(statsData);
     } catch (error) {
-      debugLog("处理请求时出错: %v", error);
+      debugLog(`处理请求时出错: ${error}`);
       return JSON.stringify({
         totalRequests: 0,
         successfulRequests: 0,
@@ -633,7 +632,7 @@ declare namespace Deno {
       
       return data.token;
     } catch (error) {
-      debugLog("
+      debugLog("执行中...");
       throw error;
     }
   }
@@ -645,7 +644,7 @@ declare namespace Deno {
     authToken: string
   ): Promise<Response> {
     try {
-      debugLog("
+      debugLog("执行中...");
       
       // 启动服务器
       const hasMultimedia = upstreamReq.messages.some(msg => 
@@ -656,7 +655,7 @@ declare namespace Deno {
       );
       
       if (hasMultimedia) {
-        debugLog(" 
+        debugLog("执行中..."); 
         
         for (let i = 0; i < upstreamReq.messages.length; i++) {
           const msg = upstreamReq.messages[i];
@@ -671,18 +670,18 @@ declare namespace Deno {
                   const mimeMatch = url.match(/data:image\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
                   const sizeKB = Math.round(url.length * 0.75 / 1024); // base64 
-                  debugLog("
+                  debugLog("执行中...");
                     i, j, format, url.length, sizeKB);
                   
                   // 
                   if (sizeKB > 1000) {
-                    debugLog("  
-                    debugLog(" 
+                    debugLog("执行中...");  
+                    debugLog("执行中..."); 
                   } else if (sizeKB > 500) {
-                    debugLog("  
+                    debugLog("执行中...");  
                   }
                 } else {
-                  debugLog(" 
+                  debugLog("执行中..."); 
                 }
               }
               
@@ -692,10 +691,10 @@ declare namespace Deno {
                 if (url.startsWith('data:video/')) {
                   const mimeMatch = url.match(/data:video\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog(" 
+                  debugLog("执行中..."); 
                     i, j, format, url.length);
                 } else {
-                  debugLog(" 
+                  debugLog("执行中..."); 
                 }
               }
               
@@ -705,10 +704,10 @@ declare namespace Deno {
                 if (url.startsWith('data:application/')) {
                   const mimeMatch = url.match(/data:application\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog(" 
+                  debugLog("执行中..."); 
                     i, j, format, url.length);
                 } else {
-                  debugLog(" 
+                  debugLog("执行中..."); 
                 }
               }
               
@@ -718,10 +717,10 @@ declare namespace Deno {
                 if (url.startsWith('data:audio/')) {
                   const mimeMatch = url.match(/data:audio\/([^;]+)/);
                   const format = mimeMatch ? mimeMatch[1] : 'unknown';
-                  debugLog(" 
+                  debugLog("执行中..."); 
                     i, j, format, url.length);
                 } else {
-                  debugLog(" 
+                  debugLog("执行中..."); 
                 }
               }
             }
@@ -729,7 +728,7 @@ declare namespace Deno {
         }
       }
       
-      debugLog("
+      debugLog("执行中...");
       
       const response = await fetch(UPSTREAM_URL, {
         method: "POST",
@@ -749,10 +748,10 @@ declare namespace Deno {
         body: JSON.stringify(upstreamReq)
       });
       
-      debugLog("
+      debugLog("执行中...");
       return response;
     } catch (error) {
-      debugLog("
+      debugLog("执行中...");
       throw error;
     }
   }
@@ -807,7 +806,7 @@ declare namespace Deno {
             const dataStr = line.substring(6);
             if (dataStr === "") continue;
             
-            debugLog("
+            debugLog("执行中...");
             
             try {
               const upstreamData = JSON.parse(dataStr) as UpstreamData;
@@ -817,19 +816,19 @@ declare namespace Deno {
                   (upstreamData.data.inner && upstreamData.data.inner.error)) {
                 const errObj = upstreamData.error || upstreamData.data.error || 
                              (upstreamData.data.inner && upstreamData.data.inner.error);
-                debugLog("
+                debugLog("执行中...");
                 
                 // 启动服务器
                 const errorDetail = (errObj?.detail || "").toLowerCase();
                 if (errorDetail.includes("something went wrong") || errorDetail.includes("try again later")) {
-                  debugLog(" Z.ai 
-                  debugLog("    
-                  debugLog("   
-                  debugLog("    
-                  debugLog("      1. 
-                  debugLog("      2. 
-                  debugLog("      3. 
-                  debugLog("      4. 
+                  debugLog("执行中..."); Z.ai 
+                  debugLog("执行中...");    
+                  debugLog("执行中...");   
+                  debugLog("执行中...");    
+                  debugLog("执行中...");      1. 
+                  debugLog("执行中...");      2. 
+                  debugLog("执行中...");      3. 
+                  debugLog("执行中...");      4. 
                 }
                 
                 // 
@@ -852,7 +851,7 @@ declare namespace Deno {
                 return;
               }
               
-              debugLog("
+              debugLog("执行中...");
                 upstreamData.type, upstreamData.data.phase, 
                 upstreamData.data.delta_content ? upstreamData.data.delta_content.length : 0, 
                 upstreamData.data.done);
@@ -865,7 +864,7 @@ declare namespace Deno {
                 }
                 
                 if (out !== "") {
-                  debugLog("
+                  debugLog("执行中...");
                   
                   const chunk: OpenAIResponse = {
                     id: `chatcmpl-${Date.now()}`,
@@ -886,7 +885,7 @@ declare namespace Deno {
               
               // 检查是否为视觉模型
               if (upstreamData.data.done || upstreamData.data.phase === "done") {
-                debugLog("
+                debugLog("执行中...");
                 
                 // 
                 const endChunk: OpenAIResponse = {
@@ -908,7 +907,7 @@ declare namespace Deno {
                 return;
               }
             } catch (error) {
-              debugLog("SSE
+              debugLog("执行中...");SSE
             }
           }
         }
@@ -955,7 +954,7 @@ declare namespace Deno {
               
               // 检查是否为视觉模型
               if (upstreamData.data.done || upstreamData.data.phase === "done") {
-                debugLog("
+                debugLog("执行中...");
                 return fullContent;
               }
             } catch (error) {
@@ -1287,7 +1286,7 @@ declare namespace Deno {
     const path = url.pathname;
     const userAgent = request.headers.get("User-Agent") || "";
     
-    debugLog("
+    debugLog("执行中...");
     
     const headers = new Headers();
     setCORSHeaders(headers);
@@ -1299,7 +1298,7 @@ declare namespace Deno {
     // 
     const authHeader = request.headers.get("Authorization");
     if (!validateApiKey(authHeader)) {
-      debugLog("
+      debugLog("执行中...");
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 401);
       addLiveRequest(request.method, path, 401, duration, userAgent);
@@ -1314,7 +1313,7 @@ declare namespace Deno {
     try {
       body = await request.text();
     } catch (error) {
-      debugLog("
+      debugLog("执行中...");
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 400);
       addLiveRequest(request.method, path, 400, duration, userAgent);
@@ -1329,7 +1328,7 @@ declare namespace Deno {
     try {
       req = JSON.parse(body) as OpenAIRequest;
     } catch (error) {
-      debugLog("JSON
+      debugLog("执行中...");JSON
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 400);
       addLiveRequest(request.method, path, 400, duration, userAgent);
@@ -1387,7 +1386,7 @@ declare namespace Deno {
         const anonToken = await getAnonymousToken();
         authToken = anonToken;
       } catch (error) {
-        debugLog("
+        debugLog("执行中...");
       }
     }
     
@@ -1399,7 +1398,7 @@ declare namespace Deno {
         return await handleNonStreamResponse(upstreamReq, chatID, authToken, startTime, path, userAgent, req, modelConfig);
       }
     } catch (error) {
-      debugLog("
+      debugLog("执行中...");
       const duration = Date.now() - startTime;
       recordRequestStats(startTime, path, 502);
       addLiveRequest(request.method, path, 502, duration, userAgent);
@@ -1460,7 +1459,7 @@ declare namespace Deno {
       
       // 启动服务器?
       processUpstreamStream(response.body, writer, encoder, req.model).catch(error => {
-        debugLog("
+        debugLog("执行中...");
       });
       
       // 启动服务器
@@ -1631,7 +1630,7 @@ declare namespace Deno {
       addLiveRequest(request.method, url.pathname, response.status, Date.now() - startTime, userAgent);
     }
   } catch (error) {
-    debugLog("处理请求时出错: %v", error);
+    debugLog(`处理请求时出错: ${error}`);
     const response = new Response("Internal Server Error", { status: 500 });
     await respondWith(response);
     recordRequestStats(startTime, url.pathname, 500);
@@ -1669,7 +1668,7 @@ async function handleRequest(request: Request): Promise<Response> {
       return response;
     }
   } catch (error) {
-    debugLog("处理请求时出错: %v", error);
+    debugLog(`处理请求时出错: ${error}`);
     recordRequestStats(startTime, url.pathname, 500);
     addLiveRequest(request.method, url.pathname, 500, Date.now() - startTime, userAgent);
     return new Response("Internal Server Error", { status: 500 });
