@@ -183,7 +183,7 @@ const ANON_TOKEN_ENABLED = true;
  * 环境变量配置
  */
 const UPSTREAM_URL = Deno.env.get("UPSTREAM_URL") || "https://chat.z.ai/api/chat/completions";
-const DEFAULT_KEY = Deno.env.get("DEFAULT_KEY") || "sk-your-key";
+const DEFAULT_KEY = Deno.env.get("DEFAULT_KEY") || "nodeloc";
 const ZAI_TOKEN = Deno.env.get("ZAI_TOKEN") || "";
 
 /**
