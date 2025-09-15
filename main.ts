@@ -844,7 +844,7 @@ async function handleIndex(request: Request): Promise<Response> {
     return new Response("Method not allowed", { status: 405 });
   }
   
-  return new Response(JSON.stringify({ msg: "接口来自PastKing公益API - NodeLoc" }), {
+  return new Response(JSON.stringify({ msg: "接口来自PastKing公益API - NodeLoc https://www.nodeloc.com/t/topic/60113" }), {
     status: 200,
     headers: {
       "Content-Type": "application/json"
